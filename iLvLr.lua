@@ -164,7 +164,12 @@ end
 
 --Thanks to John454ss for code help
 function iLvLrOnEvent(self, event, what, what2)
-	if event == "PLAYER_EQUIPMENT_CHANGED" then
+	if event == "ACTIVE_TALENT_GROUP_CHANGED" then
+--		print("Talent Change.")
+		mainSave = 0
+		offSave = 0
+--		print("Saves cleared.")
+	elseif event == "PLAYER_EQUIPMENT_CHANGED" then
 		iLvLrFrame:UnregisterEvent("PLAYER_EQUIPMENT_CHANGED")
 		iLvLrFrame:RegisterEvent("BAG_UPDATE_DELAYED")
 	elseif event == "BAG_UPDATE_DELAYED" then
@@ -193,8 +198,6 @@ function iLvLrOnEvent(self, event, what, what2)
 		iLvLrOnDuraUpdate()
 	elseif event == "INSPECT_READY" then
 		iLvLrOnInspec(what)
-	elseif event == "ACTIVE_TALENT_GROUP_CHANGED" then
-		print("Talent Change. Now Active: " .. what .. " Was Active: " .. what2)
 	end
 end
 
