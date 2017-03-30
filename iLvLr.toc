@@ -1,0 +1,9 @@
+## Interface: 70100
+## Title: |cff00ff00iLvLr|r
+## Author: JerichoHM / LownIgnitus
+## Version: 2.3.302
+## Notes: Tool to help gearing a character
+## Dependancies:
+## SavedVariablesPerCharacter: iDuraState, iColourState
+
+iLvLr.lua

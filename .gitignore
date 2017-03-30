@@ -45,3 +45,9 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+*.svn-base
+.svn/wc.db-journal
+*.db
+.svn/format
+.svn/entries
+*.dat
