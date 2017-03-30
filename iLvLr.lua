@@ -298,8 +298,10 @@ function iLvLInspecInit()
 	if InspectFrame and InspectFrame.unit then
 		--print("in call @showinspectframe")
 		local inspecIlvl = 0
+		mainSave = 0
+		offSave = 0
 		inspecIlvl = calcIlvlAvg(InspectFrame.unit)
-		print("inspecIlvl: " .. inspecIlvl)
+--		print("inspecIlvl: " .. inspecIlvl)
 		iLvLrReportFrame:SetParent(InspectPaperDollFrame)
 		iLvLrReportFrame:SetPoint("BOTTOM", InspectFrame, "RIGHT", -45, 15)
 		iLvLrReportFrame.text:SetText(format("Avg ilvl: " .. tostring(inspecIlvl)))
@@ -384,7 +386,7 @@ function calcIlvlAvg(unit)
 						--print("Slot: " .. slot .. ", itemRarity = " .. itemRarity)
 						if itemRarity == 6 then
 							if slot == "MainHandSlot" then
-								print("Main Hand ilvl start: " .. iLevel)
+--								print("Main Hand ilvl start: " .. iLevel)
 								mainSave = iLevel
 								if offSave == 0 then
 									offSave = mainSave
@@ -394,9 +396,9 @@ function calcIlvlAvg(unit)
 										iLevel = mainSave
 									end
 								end
-								print("Main Hand ilvl end: " .. iLevel)
+--								print("Main Hand ilvl end: " .. iLevel)
 							elseif slot == "SecondaryHandSlot" then
-								print("Off Hand ilvl start: " .. iLevel)
+--								print("Off Hand ilvl start: " .. iLevel)
 								offSave = iLevel
 								if mainSave == 0 then
 									mainSave = offSave
@@ -406,7 +408,7 @@ function calcIlvlAvg(unit)
 										iLevel = offSave
 									end
 								end
-								print("Off Hand ilvl end: " .. iLevel)
+--								print("Off Hand ilvl end: " .. iLevel)
 							end
 						end
 					end
@@ -645,7 +647,7 @@ function makeIlvl(frame, slot, unit, iLevel, z)
 				--print("Slot: " .. slot .. ", itemRarity = " .. itemRarity)
 				if itemRarity == 6 then
 					if slot == "MainHandSlot" then
-						print("Main Hand ilvl start: " .. iLevel)
+--						print("Main Hand ilvl start: " .. iLevel)
 						mainSave = iLevel
 						if offSave == 0 then
 							offSave = mainSave
@@ -655,9 +657,9 @@ function makeIlvl(frame, slot, unit, iLevel, z)
 								iLevel = mainSave
 							end
 						end
-						print("Main Hand ilvl end: " .. iLevel)
+--						print("Main Hand ilvl end: " .. iLevel)
 					elseif slot == "SecondaryHandSlot" then
-						print("Off Hand ilvl start: " .. iLevel)
+--						print("Off Hand ilvl start: " .. iLevel)
 						offSave = iLevel
 						if mainSave == 0 then
 							mainSave = offSave
@@ -667,7 +669,7 @@ function makeIlvl(frame, slot, unit, iLevel, z)
 								iLevel = offSave
 							end
 						end
-						print("Off Hand ilvl end: " .. iLevel)
+--						print("Off Hand ilvl end: " .. iLevel)
 					end
 				end
 			end
@@ -692,7 +694,7 @@ function makeIlvl(frame, slot, unit, iLevel, z)
 				--print("Slot: " .. slot .. ", itemRarity = " .. itemRarity)
 				if itemRarity == 6 then
 					if slot == "MainHandSlot" then
-						print("Main Hand ilvl start: " .. iLevel)
+--						print("Main Hand ilvl start: " .. iLevel)
 						mainSave = iLevel
 						if offSave == 0 then
 							offSave = mainSave
@@ -702,9 +704,9 @@ function makeIlvl(frame, slot, unit, iLevel, z)
 								iLevel = mainSave
 							end
 						end
-						print("Main Hand ilvl end: " .. iLevel)
+--						print("Main Hand ilvl end: " .. iLevel)
 					elseif slot == "SecondaryHandSlot" then
-						print("Off Hand ilvl start: " .. iLevel)
+--						print("Off Hand ilvl start: " .. iLevel)
 						offSave = iLevel
 						if mainSave == 0 then
 							mainSave = offSave
@@ -714,7 +716,7 @@ function makeIlvl(frame, slot, unit, iLevel, z)
 								iLevel = offSave
 							end
 						end
-						print("Off Hand ilvl end: " .. iLevel)
+--						print("Off Hand ilvl end: " .. iLevel)
 					end
 				end
 			end
