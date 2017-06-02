@@ -1,9 +1,10 @@
 ## Interface: 70200
 ## Title: |cff00ff00iLvLr|r
 ## Author: JerichoHM / LownIgnitus
-## Version: 2.3.304
+## Version: 2.3.305
 ## Notes: Tool to help gearing a character
 ## Dependancies:
+## OptionalDeps: LibItemUpgradeInfo-1.0
 ## SavedVariablesPerCharacter: iDuraState, iColourState
 
 iLvLr.lua

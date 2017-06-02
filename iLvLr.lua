@@ -1,6 +1,6 @@
 -- Title: iLvLr
 -- Author: JerichoHM / LownIgnitus
--- Version: 2.3.304
+-- Version: 2.3.305
 -- Desc: iLvL identifier
 
 --Version Information
@@ -9,7 +9,7 @@ local addon    = iLvLr
 local Title    = "|cff00ff00iLvLr|r"
 local Core     = "|cffFF45002|r"
 local Revision = "|cffFF45003|r"
-local Build    = "|cffFF4500303|r"
+local Build    = "|cffFF4500305|r"
 SLASH_ILVLR1 = '/ilvlr'
 
 local frameDB = {CharacterHeadSlot,
