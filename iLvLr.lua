@@ -365,6 +365,28 @@ function fetchIlvl(slotName, unit)
 	return itemlevel
 end
 
+function checkRelicIlvl(relicLink)
+	if relicLink then
+	if not iLvLrScanner then CreateFrame("GameToolTip", "iLvLrScanner", UIParent, "GameTooltipTemplate") end
+	local ttScanner = iLvLrScanner
+	
+	ttScanner:SetOwner(iLvLrFrame, "ANCHOR_NONE")
+	ttScanner:ClearLines()
+	ttScanner:SetHyperlink(relicLink)
+		for i = 1,4 do
+			if _G["iLvLrScannerTextLeft" .. i]:GetText() then
+				local rilvl = _G["iLvLrScannerTextLeft" .. i]:GetText():match(ITEM_LEVEL:gsub("%%d","(%%d+)"));
+				if rilvl then
+					return tonumber(rilvl)
+				end
+			else
+				break
+			end
+		end
+	end
+	return 0;
+end
+
 function calcIlvlAvg(unit)
 	--print("in calc")
 	local total = 0
@@ -639,106 +661,59 @@ function makeIlvl(frame, slot, unit, iLevel, z)
 		isValid = iLvlText:SetFont("Fonts\\FRIZQT__.TTF", 13, "OUTLINE")
 		iLvlText:SetPoint("CENTER", iLvl, "CENTER", 0, 0)
 		iLvl.text = iLvlText
-
-		if iLevel > 749 then
-			if slot == "MainHandSlot" or slot == "SecondaryHandSlot" then
-				local weapon = GetInventoryItemID(unit, GetInventorySlotInfo(slot))
-				local _, itemLink, itemRarity, _, _, _, _, _, _, _, _ = GetItemInfo(weapon)
-				--print("Slot: " .. slot .. ", itemRarity = " .. itemRarity)
-				if itemRarity == 6 then
-					if slot == "MainHandSlot" then
---						print("Main Hand ilvl start: " .. iLevel)
-						mainSave = iLevel
-						if offSave == 0 then
-							offSave = mainSave
-						elseif offSave > 750 then
-							if offSave > mainSave then
-								mainSave = offSave
-								iLevel = mainSave
-							end
-						end
---						print("Main Hand ilvl end: " .. iLevel)
-					elseif slot == "SecondaryHandSlot" then
---						print("Off Hand ilvl start: " .. iLevel)
-						offSave = iLevel
-						if mainSave == 0 then
+	end
+	
+	if iLevel > 749 then
+		if slot == "MainHandSlot" or slot == "SecondaryHandSlot" then
+			local weapon = GetInventoryItemID(unit, GetInventorySlotInfo(slot))
+			local _, _, itemRarity, _, _, _, _, _, _, _, _ = GetItemInfo(weapon)
+			--print("Slot: " .. slot .. ", itemRarity = " .. itemRarity)
+			if itemRarity == 6 then
+				if slot == "MainHandSlot" then
+--					print("Main Hand ilvl start: " .. iLevel)
+					mainSave = iLevel
+					if offSave == 0 then
+						offSave = mainSave
+					elseif offSave > 750 then
+						if offSave > mainSave then
 							mainSave = offSave
-						elseif mainSave > 750 then
-							if mainSave > offSave then
-								offSave = mainSave
-								iLevel = offSave
-							end
+							iLevel = mainSave
 						end
---						print("Off Hand ilvl end: " .. iLevel)
 					end
-					for aw = 1, 3 do
-						local relicName, relicLink = GetItemGem(itemLink, aw)
-						if relicLink then
-							print("relicName: " .. relicName .. ".")
+--					print("Main Hand ilvl end: " .. iLevel)
+				elseif slot == "SecondaryHandSlot" then
+--					print("Off Hand ilvl start: " .. iLevel)
+					offSave = iLevel
+					if mainSave == 0 then
+						mainSave = offSave
+					elseif mainSave > 750 then
+						if mainSave > offSave then
+							offSave = mainSave
+							iLevel = offSave
 						end
+					end
+--					print("Off Hand ilvl end: " .. iLevel)
+				end
+				for aw = 1, 3 do
+					local relicName, relicLink = GetItemGem(itemLink, aw)
+					if relicLink then
+						print("relicName: " .. relicName .. ".")
 					end
 				end
 			end
 		end
-		
-		if iColourState == "enabled" then
-			if iLevel <= iEqAvg - 10 then
-				iLvl.text:SetFormattedText("|cffff0000%i|r", iLevel)
-			elseif iLevel >= iEqAvg + 10 then
-				iLvl.text:SetFormattedText("|cff00ff00%i|r", iLevel)
-			else
-				iLvl.text:SetFormattedText("|cffffffff%i|r", iLevel)
-			end
-		elseif iColourState == "disabled" then
-			iLvl.text:SetFormattedText("|cffffffff%i|r", iLevel)
-		end
-	else
-		if iLevel > 749 then
-			if slot == "MainHandSlot" or slot == "SecondaryHandSlot" then
-				local weapon = GetInventoryItemID(unit, GetInventorySlotInfo(slot))
-				local _, _, itemRarity, _, _, _, _, _, _, _, _ = GetItemInfo(weapon)
-				--print("Slot: " .. slot .. ", itemRarity = " .. itemRarity)
-				if itemRarity == 6 then
-					if slot == "MainHandSlot" then
---						print("Main Hand ilvl start: " .. iLevel)
-						mainSave = iLevel
-						if offSave == 0 then
-							offSave = mainSave
-						elseif offSave > 750 then
-							if offSave > mainSave then
-								mainSave = offSave
-								iLevel = mainSave
-							end
-						end
---						print("Main Hand ilvl end: " .. iLevel)
-					elseif slot == "SecondaryHandSlot" then
---						print("Off Hand ilvl start: " .. iLevel)
-						offSave = iLevel
-						if mainSave == 0 then
-							mainSave = offSave
-						elseif mainSave > 750 then
-							if mainSave > offSave then
-								offSave = mainSave
-								iLevel = offSave
-							end
-						end
---						print("Off Hand ilvl end: " .. iLevel)
-					end
-				end
-			end
-		end
+	end
 
-		if iColourState == "enabled" then
-			if iLevel <= iEqAvg - 10 then
-				iLvl.text:SetFormattedText("|cffff0000%i|r", iLevel)
-			elseif iLevel >= iEqAvg + 10 then
-				iLvl.text:SetFormattedText("|cff00ff00%i|r", iLevel)
-			else
-				iLvl.text:SetFormattedText("|cffffffff%i|r", iLevel)
-			end
-		elseif iColourState == "disabled" then
+	if iColourState == "enabled" then
+		if iLevel <= iEqAvg - 10 then
+			iLvl.text:SetFormattedText("|cffff0000%i|r", iLevel)
+		elseif iLevel >= iEqAvg + 10 then
+			iLvl.text:SetFormattedText("|cff00ff00%i|r", iLevel)
+		else
 			iLvl.text:SetFormattedText("|cffffffff%i|r", iLevel)
 		end
+	elseif iColourState == "disabled" then
+		iLvl.text:SetFormattedText("|cffffffff%i|r", iLevel)
 	end
 
 	if unit == "player" then
