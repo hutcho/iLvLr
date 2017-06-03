@@ -106,7 +106,7 @@ local iModFrames  = {}
 local iLvlIFrames  = {}
 local iDuraIFrames = {}
 local iModIFrames  = {}
-local iLvLrReportFrame = CreateFrame("Frame", "iLvLrInspecFrame")
+addon.iLvLrReportFrame = CreateFrame("Frame", "iLvLrInspecFrame")
 iLvLrReportFrame:ClearAllPoints()
 iLvLrReportFrame:SetHeight(300)
 iLvLrReportFrame:SetWidth(1000)
@@ -409,25 +409,25 @@ function calcIlvlAvg(unit)
 						if itemRarity == 6 then
 							if slot == "MainHandSlot" then
 --								print("Main Hand ilvl start: " .. iLevel)
-								mainSave = iLevel
-								if offSave == 0 then
-									offSave = mainSave
-								elseif offSave > 750 then
-									if offSave > mainSave then
-										mainSave = offSave
-										iLevel = mainSave
+								mainISave = iLevel
+								if offISave == 0 then
+									offISave = mainISave
+								elseif offISave > 750 then
+									if offISave > mainISave then
+										mainISave = offISave
+										iLevel = mainISave
 									end
 								end
 --								print("Main Hand ilvl end: " .. iLevel)
 							elseif slot == "SecondaryHandSlot" then
 --								print("Off Hand ilvl start: " .. iLevel)
-								offSave = iLevel
-								if mainSave == 0 then
-									mainSave = offSave
-								elseif mainSave > 750 then
-									if mainSave > offSave then
-										offSave = mainSave
-										iLevel = offSave
+								offISave = iLevel
+								if mainISave == 0 then
+									mainISave = offISave
+								elseif mainISave > 750 then
+									if mainISave > offISave then
+										offISave = mainISave
+										iLevel = offISave
 									end
 								end
 --								print("Off Hand ilvl end: " .. iLevel)
