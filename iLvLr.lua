@@ -106,7 +106,7 @@ local iModFrames  = {}
 local iLvlIFrames  = {}
 local iDuraIFrames = {}
 local iModIFrames  = {}
-addon.iLvLrReportFrame = CreateFrame("Frame", "iLvLrInspecFrame")
+local iLvLrReportFrame = CreateFrame("Frame", "iLvLrInspecFrame")
 iLvLrReportFrame:ClearAllPoints()
 iLvLrReportFrame:SetHeight(300)
 iLvLrReportFrame:SetWidth(1000)
@@ -666,8 +666,8 @@ function makeIlvl(frame, slot, unit, iLevel, z)
 	if iLevel > 749 then
 		if slot == "MainHandSlot" or slot == "SecondaryHandSlot" then
 			local weapon = GetInventoryItemID(unit, GetInventorySlotInfo(slot))
-			local _, _, itemRarity, _, _, _, _, _, _, _, _ = GetItemInfo(weapon)
-			--print("Slot: " .. slot .. ", itemRarity = " .. itemRarity)
+			local name, _, itemRarity, _, _, _, _, _, _, _, _ = GetItemInfo(weapon)
+			print("Slot: " .. slot .. ", itemRarity = " .. itemRarity .. ", name: " .. name)
 			if itemRarity == 6 then
 				if slot == "MainHandSlot" then
 --					print("Main Hand ilvl start: " .. iLevel)
@@ -695,9 +695,15 @@ function makeIlvl(frame, slot, unit, iLevel, z)
 --					print("Off Hand ilvl end: " .. iLevel)
 				end
 				for aw = 1, 3 do
-					local relicName, relicLink = GetItemGem(itemLink, aw)
-					if relicLink then
-						print("relicName: " .. relicName .. ".")
+					--print("aw: " .. aw)
+					local item = GetInventoryItemLink("player", slot)
+					--print(item:gsub("|","||"))
+					if item then
+						local relicLink = select(2,GetItemGem(item, aw))
+						if relicLink then
+							rilvl = checkRelicIlvl(relicLink)
+							print("relicLink: " .. relicLink .. ", ilvl: " .. rilvl)
+						end
 					end
 				end
 			end
