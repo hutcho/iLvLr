@@ -643,7 +643,7 @@ function makeIlvl(frame, slot, unit, iLevel, z)
 		if iLevel > 749 then
 			if slot == "MainHandSlot" or slot == "SecondaryHandSlot" then
 				local weapon = GetInventoryItemID(unit, GetInventorySlotInfo(slot))
-				local _, _, itemRarity, _, _, _, _, _, _, _, _ = GetItemInfo(weapon)
+				local _, itemLink, itemRarity, _, _, _, _, _, _, _, _ = GetItemInfo(weapon)
 				--print("Slot: " .. slot .. ", itemRarity = " .. itemRarity)
 				if itemRarity == 6 then
 					if slot == "MainHandSlot" then
@@ -670,6 +670,12 @@ function makeIlvl(frame, slot, unit, iLevel, z)
 							end
 						end
 --						print("Off Hand ilvl end: " .. iLevel)
+					end
+					for aw = 1, 3 do
+						local relicName, relicLink = GetItemGem(itemLink, aw)
+						if relicLink then
+							print("relicName: " .. relicName .. ".")
+						end
 					end
 				end
 			end
