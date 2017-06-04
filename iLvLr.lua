@@ -751,9 +751,13 @@ function makeIlvl(frame, slot, unit, iLevel, z)
 		iLvl.text:SetFormattedText("|cffffffff%i|r", iLevel)
 	end
 
+	iLvlAR.text:SetFormattedText("|cffffffff%i|r", relics.rilvl1)
+
 	if unit == "player" then
 		iLvlFrames[slot] = iLvl
 		iLvl:SetParent(PaperDollItemsFrame)
+		iLvlARFrames[slot] = iLvlAR
+		iLvlAR:SetParent(PaperDollItemsFrame)
 	elseif unit ~= "player" then
 		iLvlIFrames[slot] = iLvl
 		iLvl:SetParent(InspectPaperDollFrame)
