@@ -96,14 +96,18 @@ local iEqAvg, iAvg, lastInspecReady, InspecGUID
 local inspec = false
 local z = 0
 local iLvl = {}
-local iLvlAR = {}
+local iLvlAR1 = {}
+local iLvlAR2 = {}
+local iLvlAR3 = {}
 local relics = {}
 local mainSave = 0
 local mainISave = 0
 local offSave = 0
 local offISave = 0
 local iLvlFrames  = {}
-local iLvlARFrames = {}
+local iLvlAR1Frame = {}
+local iLvlAR2Frame = {}
+local iLvlAR3Frame = {}
 local iDuraFrames = {}
 local iModFrames  = {}
 local iLvlIFrames  = {}
@@ -248,7 +252,9 @@ function iLvLrOnItemUpdate()
 		else
 			if iLvlFrames[v] then
 				iLvlFrames[v]:Hide()
-				iLvlARFrames[v]:Hide()
+				iLvlAR1Frame[v]:Hide()
+				iLvlAR2Frame[v]:Hide()
+				iLvlAR3Frame[v]:Hide()
 			end
 			if iDuraFrames[v] then
 				iDuraFrames[v]:Hide()
@@ -604,28 +610,6 @@ function fetchChant(slotName, unit)
 	end
 end
 
---[[function fetchProfs()
-	local prof1, prof2, archaeology, fishing, cooking, firstAid = GetProfessions()
-	local profs = {prof1, prof2, archaeology, fishing, cooking, firstAid}
-	local profNames = {}
-	
-	for k, v in pairs(profs) do
-		local name, texture, rank, maxRank, numSpells, spelloffset, skillLine, rankModifier = GetProfessionInfo(v)
-		tinsert(profNames, name)
-	end
-	
-	return profNames
-end]]
-
-function fetchSubclass(slotName, unit)
-	local slotId, texture, checkRelic = GetInventorySlotInfo(slotName)
-	local itemId = GetInventoryItemID(unit, slotId)
-	if itemId then
-		local _, _, _, _, _, _, subclass, _, _, _, _ = GetItemInfo(itemId)
-		return(subclass)
-	end
-end
-
 function makeIlvl(frame, slot, unit, iLevel, z)
 	--print("in makeText")
 	iAvg, iEqAvg = GetAverageItemLevel()
@@ -673,24 +657,62 @@ function makeIlvl(frame, slot, unit, iLevel, z)
 			local name, _, itemRarity, _, _, _, _, _, _, _, _ = GetItemInfo(weapon)
 --			print("Slot: " .. slot .. ", itemRarity = " .. itemRarity .. ", name: " .. name .. ", itemID: " .. weapon)
 			if itemRarity == 6 then
-				iLvlAR = iLvlARFrames[slot]
+				iLvlAR1 = iLvlAR1Frame[slot]
+				iLvlAR2 = iLvlAR2Frame[slot]
+				iLvlAR3 = iLvlAR3Frame[slot]
 
-				if not iLvlAR then
-					iLvlAR = CreateFrame("Frame", nil, frame)
+				if not iLvlAR1 then
+					iLvlAR1 = CreateFrame("Frame", nil, frame)
 					if frame == CharacterMainHandSlot then
-						iLvlAR:SetPoint("CENTER", frame, "CENTER", -32, -1)
+						iLvlAR1:SetPoint("TOP", frame, "TOP", -35, 0)
 					elseif frame == CharacterSecondaryHandSlot then
-						iLvlAR:SetPoint("CENTER", frame, "CENTER", 32, -1)
+						iLvlAR1:SetPoint("TOP", frame, "TOP", 35, 0)
 					end
 
-					iLvlAR:SetSize(10,10)
-					iLvlAR:SetBackdrop({bgFile = nil, edgeFile = nil, tile = false, tileSize = 32, edgeSize = 0, insets = {left = 0, right = 0, top = 0, bottom = 0}})
-					iLvlAR:SetBackdropColor(0,0,0,0)
+					iLvlAR1:SetSize(10,10)
+					iLvlAR1:SetBackdrop({bgFile = nil, edgeFile = nil, tile = false, tileSize = 32, edgeSize = 0, insets = {left = 0, right = 0, top = 0, bottom = 0}})
+					iLvlAR1:SetBackdropColor(0,0,0,0)
 					
-					local iLvlARText = iLvlAR:CreateFontString(nil, "ARTWORK")
-					isValid = iLvlARText:SetFont("Fonts\\FRIZQT__.TTF", 13, "OUTLINE")
-					iLvlARText:SetPoint("CENTER", iLvlAR, "CENTER", 0, 0)
-					iLvlAR.text = iLvlARText
+					local iLvlAR1Text = iLvlAR1:CreateFontString(nil, "ARTWORK")
+					isValid = iLvlAR1Text:SetFont("Fonts\\FRIZQT__.TTF", 13, "OUTLINE")
+					iLvlAR1Text:SetPoint("CENTER", iLvlAR1, "CENTER", 0, 0)
+					iLvlAR1.text = iLvlAR1Text
+				end
+
+				if not iLvlAR2 then
+					iLvlAR2 = CreateFrame("Frame", nil, frame)
+					if frame == CharacterMainHandSlot then
+						iLvlAR2:SetPoint("CENTER", frame, "CENTER", -35, 0)
+					elseif frame == CharacterSecondaryHandSlot then
+						iLvlAR2:SetPoint("CENTER", frame, "CENTER", 35, 0)
+					end
+
+					iLvlAR2:SetSize(10,10)
+					iLvlAR2:SetBackdrop({bgFile = nil, edgeFile = nil, tile = false, tileSize = 32, edgeSize = 0, insets = {left = 0, right = 0, top = 0, bottom = 0}})
+					iLvlAR2:SetBackdropColor(0,0,0,0)
+					
+					local iLvlAR2Text = iLvlAR2:CreateFontString(nil, "ARTWORK")
+					isValid = iLvlAR2Text:SetFont("Fonts\\FRIZQT__.TTF", 13, "OUTLINE")
+					iLvlAR2Text:SetPoint("CENTER", iLvlAR2, "CENTER", 0, 0)
+					iLvlAR2.text = iLvlAR2Text
+				end
+
+				if not iLvlAR3 then
+					iLvlAR3 = CreateFrame("Frame", nil, frame)
+					if frame == CharacterMainHandSlot then
+						iLvlAR3:SetPoint("BOTTOM", frame, "BOTTOM", -35, 0)
+					elseif frame == CharacterSecondaryHandSlot then
+						iLvlAR3:SetPoint("BOTTOM", frame, "BOTTOM", 35, 0)
+					end
+
+					iLvlAR3:SetSize(10,10)
+					iLvlAR3:SetBackdrop({bgFile = nil, edgeFile = nil, tile = false, tileSize = 32, edgeSize = 0, insets = {left = 0, right = 0, top = 0, bottom = 0}})
+					iLvlAR3:SetBackdropColor(0,0,0,0)
+					
+					local iLvlAR3Text = iLvlAR3:CreateFontString(nil, "ARTWORK")
+					isValid = iLvlAR3Text:SetFont("Fonts\\FRIZQT__.TTF", 13, "OUTLINE")
+					iLvlAR3Text:SetPoint("CENTER", iLvlAR3, "CENTER", 0, 0)
+					iLvlAR3.text = iLvlAR3Text
 				end
 
 				if slot == "MainHandSlot" then
@@ -717,28 +739,50 @@ function makeIlvl(frame, slot, unit, iLevel, z)
 						end
 					end
 --					print("Off Hand ilvl end: " .. iLevel)
+					iLvlAR1.text:SetText("")
+					iLvlAR2.text:SetText("")
+					iLvlAR3.text:SetText("")
 				end
 				if unit =="player" then
 					local artifactID = lad:GetArtifactInfo()
 --					print("artifactID: " .. artifactID)
+					iLvlAR1.text:SetText("")
+					iLvlAR2.text:SetText("")
+					iLvlAR3.text:SetText("")
 					if weapon == artifactID then
 						local id, data = lad:GetArtifactRelics(artifactID)
 						for aw = 1, 3 do
 							if data[aw].name then
 								local rilvl = checkRelicIlvl(data[aw].link)
-								tinsert(relics, rilvl)
-								print("relicName" .. aw .. ": " .. data[aw].link .. ", relicType" .. data[aw].type .. ", ilvl: " .. rilvl .. ", rilvl: " .. relics[aw])
-								iLvlAR.text:SetFormattedText("|cffffffff%i|r", relics[aw])
+								print("relicName" .. aw .. ": " .. data[aw].link .. ", relicType" .. data[aw].type .. ", ilvl: " .. rilvl)
+								local _,_,colour = string.find(data[aw].link, "|?c?f?f?(%x*)")
+								--print(colour)
+								if aw == 1 then
+									iLvlAR1.text:SetFormattedText("|cff"..colour.."%i|r", rilvl)
+								elseif aw == 2 then
+									iLvlAR2.text:SetFormattedText("|cff"..colour.."%i|r", rilvl)
+								elseif aw == 3 then
+									iLvlAR3.text:SetFormattedText("|cff"..colour.."%i|r", rilvl)
+								end
 							else
 								print("relic slot " .. aw .. " is empty.")
 							end
 						end
+						iLvlAR1Frame[slot] = iLvlAR1
+						iLvlAR2Frame[slot] = iLvlAR2
+						iLvlAR3Frame[slot] = iLvlAR3
+						iLvlAR1:SetParent(PaperDollItemsFrame)
+						iLvlAR2:SetParent(PaperDollItemsFrame)
+						iLvlAR3:SetParent(PaperDollItemsFrame)
+						iLvlAR1:Show()
+						iLvlAR2:Show()
+						iLvlAR3:Show()
 					else
 						--print("weapon(" .. weapon .. ") and itemID(" .. itemID .. ") do not match.")
+						iLvlAR1:Hide()
+						iLvlAR2:Hide()
+						iLvlAR3:Hide()
 					end
-					iLvlARFrames[slot] = iLvlAR
-					iLvlAR:SetParent(PaperDollItemsFrame)
-					iLvlAR:Show()
 				end
 			end
 		end
