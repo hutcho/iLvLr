@@ -784,12 +784,22 @@ function makeIlvl(frame, slot, unit, iLevel, z)
 --								print("relicName" .. aw .. ": " .. data[aw].link .. ", relicType" .. data[aw].type .. ", ilvl: " .. rilvl)
 								local _,_,colour = string.find(data[aw].link, "|?c?f?f?(%x*)")
 								--print(colour)
-								if aw == 1 then
-									iLvlAR1.text:SetFormattedText("|cff"..colour.."%i|r", rilvl)
-								elseif aw == 2 then
-									iLvlAR2.text:SetFormattedText("|cff"..colour.."%i|r", rilvl)
-								elseif aw == 3 then
-									iLvlAR3.text:SetFormattedText("|cff"..colour.."%i|r", rilvl)
+								if slot == "MainHandSlot" then
+									if aw == 1 then
+										iLvlAR1.text:SetFormattedText("%s |cff"..colour.."%i|r", data[aw].type, rilvl)
+									elseif aw == 2 then
+										iLvlAR2.text:SetFormattedText("%s |cff"..colour.."%i|r", data[aw].type, rilvl)
+									elseif aw == 3 then
+										iLvlAR3.text:SetFormattedText("%s |cff"..colour.."%i|r", data[aw].type, rilvl)
+									end
+								elseif slot == "SecondaryHandSlot" then
+									if aw == 1 then
+										iLvlAR1.text:SetFormattedText("|cff"..colour.."%i|r %s", rilvl, data[aw].type)
+									elseif aw == 2 then
+										iLvlAR2.text:SetFormattedText("|cff"..colour.."%i|r %s", rilvl, data[aw].type)
+									elseif aw == 3 then
+										iLvlAR3.text:SetFormattedText("|cff"..colour.."%i|r %s", rilvl, data[aw].type)
+									end
 								end
 							else
 --								print("relic slot " .. aw .. " is empty.")
