@@ -96,11 +96,14 @@ local iEqAvg, iAvg, lastInspecReady, InspecGUID
 local inspec = false
 local z = 0
 local iLvl = {}
+local iLvlAR = {}
+local relics = {}
 local mainSave = 0
 local mainISave = 0
 local offSave = 0
 local offISave = 0
 local iLvlFrames  = {}
+local iLvlARFrames = {}
 local iDuraFrames = {}
 local iModFrames  = {}
 local iLvlIFrames  = {}
@@ -245,6 +248,7 @@ function iLvLrOnItemUpdate()
 		else
 			if iLvlFrames[v] then
 				iLvlFrames[v]:Hide()
+				iLvlARFrames[v]:Hide()
 			end
 			if iDuraFrames[v] then
 				iDuraFrames[v]:Hide()
@@ -627,6 +631,7 @@ function makeIlvl(frame, slot, unit, iLevel, z)
 	iAvg, iEqAvg = GetAverageItemLevel()
 	if unit == "player" then
 		iLvl = iLvlFrames[slot]
+		iLvlAR = iLvlARFrames[slot]
 	elseif unit ~= "player" then
 		iLvl = iLvlIFrames[slot]
 		--print("iLvlIFrames make")
@@ -663,6 +668,24 @@ function makeIlvl(frame, slot, unit, iLevel, z)
 		iLvl.text = iLvlText
 	end
 	
+	if not iLvlAR then
+		iLvlAR = CreateFrame("Frame", nil, frame)
+		if frame == CharacterMainHandSlot then
+			iLvlAR:SetPoint("CENTER", frame, "CENTER", -42, -1)
+		elseif frame == CharacterSecondaryHandSlot then
+			iLvlAR:SetPoint("CENTER", frame, "CENTER", 42, -1)
+		end
+
+		iLvlAR:SetSize(10,10)
+		iLvlAR:SetBackdrop({bgFile = nil, edgeFile = nil, tile = false, tileSize = 32, edgeSize = 0, insets = {left = 0, right = 0, top = 0, bottom = 0}})
+		iLvlAR:SetBackdropColor(0,0,0,0)
+		
+		local iLvlARText = iLvlAR:CreateFontString(nil, "ARTWORK")
+		isValid = iLvlARText:SetFont("Fonts\\FRIZQT__.TTF", 13, "OUTLINE")
+		iLvlARText:SetPoint("CENTER", iLvlAR, "CENTER", 0, 0)
+		iLvlAR.text = iLvlARText
+	end
+
 	if iLevel > 749 then
 		if slot == "MainHandSlot" or slot == "SecondaryHandSlot" then
 			local weapon = GetInventoryItemID(unit, GetInventorySlotInfo(slot))
@@ -694,20 +717,23 @@ function makeIlvl(frame, slot, unit, iLevel, z)
 					end
 --					print("Off Hand ilvl end: " .. iLevel)
 				end
-				local artifactID = lad:GetArtifactInfo()
---				print("artifactID: " .. artifactID)
-				if weapon == artifactID then
-					local id, data = lad:GetArtifactRelics(artifactID)
-					for aw = 1, 3 do
-						if data[aw].name then
-							rilvl = checkRelicIlvl(data[aw].link)
-							print("relicName" .. aw .. ": " .. data[aw].link .. ", relicType" .. data[aw].type .. ", ilvl: " .. rilvl)
-						else
-							print("relic slot " .. aw .. " is empty.")
+				if unit =="player" then
+					local artifactID = lad:GetArtifactInfo()
+--					print("artifactID: " .. artifactID)
+					if weapon == artifactID then
+						local id, data = lad:GetArtifactRelics(artifactID)
+						for aw = 1, 3 do
+							if data[aw].name then
+								rilvl = checkRelicIlvl(data[aw].link)
+								relics.rilvl[aw] = rilvl
+								print("relicName" .. aw .. ": " .. data[aw].link .. ", relicType" .. data[aw].type .. ", ilvl: " .. rilvl .. ", rilvl: " .. relics.rilvl[aw])
+							else
+								print("relic slot " .. aw .. " is empty.")
+							end
 						end
+					else
+						--print("weapon(" .. weapon .. ") and itemID(" .. itemID .. ") do not match.")
 					end
-				else
-					--print("weapon(" .. weapon .. ") and itemID(" .. itemID .. ") do not match.")
 				end
 			end
 		end
@@ -735,6 +761,7 @@ function makeIlvl(frame, slot, unit, iLevel, z)
 	end
 
 	iLvl:Show()
+	iLvlAR:Show()
 end
 
 function makeDurability(frame, slot, unit)
