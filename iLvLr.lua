@@ -365,17 +365,17 @@ function fetchIlvl(slotName, unit)
 	return itemlevel
 end
 
-function checkRelicIlvl(relicLink)
-	if relicLink then
+function checkRelicIlvl(relicItemLink)
+	if relicItemLink then
 	if not iLvLrScanner then CreateFrame("GameToolTip", "iLvLrScanner", UIParent, "GameTooltipTemplate") end
 	local ttScanner = iLvLrScanner
 	
 	ttScanner:SetOwner(iLvLrFrame, "ANCHOR_NONE")
 	ttScanner:ClearLines()
-	ttScanner:SetHyperlink(relicLink)
+	ttScanner:SetHyperlink(relicItemLink)
 		for i = 1,4 do
 			if _G["iLvLrScannerTextLeft" .. i]:GetText() then
-				local rilvl = _G["iLvLrScannerTextLeft" .. i]:GetText():match(ITEM_LEVEL:gsub("%%d","(%%d+)"));
+				local rilvl = _G["iLvLrScannerTextLeft" .. i]:GetText():match(iLevelFilter);
 				if rilvl then
 					return tonumber(rilvl)
 				end
@@ -667,7 +667,7 @@ function makeIlvl(frame, slot, unit, iLevel, z)
 		if slot == "MainHandSlot" or slot == "SecondaryHandSlot" then
 			local weapon = GetInventoryItemID(unit, GetInventorySlotInfo(slot))
 			local name, _, itemRarity, _, _, _, _, _, _, _, _ = GetItemInfo(weapon)
-			print("Slot: " .. slot .. ", itemRarity = " .. itemRarity .. ", name: " .. name)
+			--print("Slot: " .. slot .. ", itemRarity = " .. itemRarity .. ", name: " .. name .. ", itemID: " .. weapon)
 			if itemRarity == 6 then
 				if slot == "MainHandSlot" then
 --					print("Main Hand ilvl start: " .. iLevel)
@@ -694,17 +694,33 @@ function makeIlvl(frame, slot, unit, iLevel, z)
 					end
 --					print("Off Hand ilvl end: " .. iLevel)
 				end
-				for aw = 1, 3 do
-					--print("aw: " .. aw)
-					local item = GetInventoryItemLink("player", slot)
-					--print(item:gsub("|","||"))
-					if item then
-						local relicLink = select(2,GetItemGem(item, aw))
-						if relicLink then
-							rilvl = checkRelicIlvl(relicLink)
-							print("relicLink: " .. relicLink .. ", ilvl: " .. rilvl)
-						end
+				if (C_ArtifactUI.GetArtifactInfo()) then	
+					local itemID, altItemID, name, iconFileDataID, powerAvailable, ranksPurchased, ranksKnown, artifactAppearanceID, appearanceModID, itemAppearanceID, altItemAppearanceID, altOnTop = C_ArtifactUI.GetArtifactInfo()
+					--[[if itemID == nil then
+						itemID = tostring(itemID)
 					end
+					print("itemID: " .. itemID)
+					if altItemID ~= "nil" then
+						altItemID = tostring(altItemID)
+						print("altItemID: " .. altItemID)
+					end]]
+					if weapon == itemID then
+						local numRelicSlots = C_ArtifactUI.GetNumRelicSlots();
+						print("numRelicSlots: " .. numRelicSlots)
+						for aw = 1, numRelicSlots do
+							local relicName, relicIcon, relicType, relicItemLink = C_ArtifactUI.GetRelicInfo(aw)
+							if relicName then
+								rilvl = checkRelicIlvl(relicItemLink)
+								print("relicName" .. aw .. ": " .. relicItemLink .. ", relicType" .. relicType .. ", ilvl: " .. rilvl)
+							else
+								print("relic slot " .. aw .. " is empty.")
+							end
+						end
+					else
+						--print("weapon(" .. weapon .. ") and itemID(" .. itemID .. ") do not match.")
+					end
+				else
+					--print("Artifact not equipped.")
 				end
 			end
 		end
@@ -876,8 +892,8 @@ function makeMod(frame, slot, unit, iLevel)
 	elseif iLevel > 599 then
 		if slot == "SecondaryHandSlot" and iLevel < 749 then
 			local offHand = GetInventoryItemID(unit, GetInventorySlotInfo("SecondaryHandSlot"))
-			local _, _, _, _, _, itemClass, itemSubclass, _, _, _, _ = GetItemInfo(offHand)
-			if itemClass == "Weapon" then
+			local _, _,itemRarity, _, _, itemClass, itemSubclass, _, _, _, _ = GetItemInfo(offHand)
+			if itemClass == "Weapon" or itemRarity == 7 then
 				canEnchant = true
 				isEnchanted = fetchChant(slot, unit)
 			end
@@ -885,10 +901,10 @@ function makeMod(frame, slot, unit, iLevel)
 			--print(itemSubclass)
 		elseif iLevel > 749 then
 			local mainHand = GetInventoryItemID(unit, GetInventorySlotInfo("MainHandSlot"))
-			local _, _, _, _, _, itemClass, itemSubclass, _, _, _, _ = GetItemInfo(mainHand)
+			local _, _, itemRarity, _, _, itemClass, itemSubclass, _, _, _, _ = GetItemInfo(mainHand)
 			local _, englishClass, _ = UnitClass(unit)
 			if slot == "MainHandSlot" or slot == "SecondaryHandSlot" then
-				if itemClass == "Weapon" then
+				if itemClass == "Weapon" and itemRarity == 6 then
 					if englishClass == "DEATHKNIGHT" then
 						canEnchant = true
 						isEnchanted = fetchChant(slot, unit)
@@ -905,7 +921,7 @@ function makeMod(frame, slot, unit, iLevel)
 				end
 			end
 		else 
-			for k ,v in pairs(isEnchantableWoD) do
+			for k ,v in pairs(isEnchantable) do
 				if v == slot then
 					canEnchant = true
 					isEnchanted = fetchChant(slot, unit)

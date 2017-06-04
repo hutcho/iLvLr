@@ -4,7 +4,7 @@
 ## Version: 2.3.305
 ## Notes: Tool to help gearing a character
 ## Dependancies:
-## OptionalDeps: LibItemUpgradeInfo-1.0
+## OptionalDeps: LibStub, CallbackHandler-1.0, LibArtifactData-1.0
 ## SavedVariablesPerCharacter: iDuraState, iColourState
 
 iLvLr.lua
