@@ -91,7 +91,7 @@ local isEnchantableWoD = {"NeckSlot",
 							}
 					
 local iLevelFilter = ITEM_LEVEL:gsub( "%%d", "(%%d+)" )
-
+local lad = LibStub("LibArtifactData-1.0")
 local iEqAvg, iAvg, lastInspecReady, InspecGUID
 local inspec = false
 local z = 0
@@ -667,7 +667,7 @@ function makeIlvl(frame, slot, unit, iLevel, z)
 		if slot == "MainHandSlot" or slot == "SecondaryHandSlot" then
 			local weapon = GetInventoryItemID(unit, GetInventorySlotInfo(slot))
 			local name, _, itemRarity, _, _, _, _, _, _, _, _ = GetItemInfo(weapon)
-			--print("Slot: " .. slot .. ", itemRarity = " .. itemRarity .. ", name: " .. name .. ", itemID: " .. weapon)
+--			print("Slot: " .. slot .. ", itemRarity = " .. itemRarity .. ", name: " .. name .. ", itemID: " .. weapon)
 			if itemRarity == 6 then
 				if slot == "MainHandSlot" then
 --					print("Main Hand ilvl start: " .. iLevel)
@@ -694,33 +694,20 @@ function makeIlvl(frame, slot, unit, iLevel, z)
 					end
 --					print("Off Hand ilvl end: " .. iLevel)
 				end
-				if (C_ArtifactUI.GetArtifactInfo()) then	
-					local itemID, altItemID, name, iconFileDataID, powerAvailable, ranksPurchased, ranksKnown, artifactAppearanceID, appearanceModID, itemAppearanceID, altItemAppearanceID, altOnTop = C_ArtifactUI.GetArtifactInfo()
-					--[[if itemID == nil then
-						itemID = tostring(itemID)
-					end
-					print("itemID: " .. itemID)
-					if altItemID ~= "nil" then
-						altItemID = tostring(altItemID)
-						print("altItemID: " .. altItemID)
-					end]]
-					if weapon == itemID then
-						local numRelicSlots = C_ArtifactUI.GetNumRelicSlots();
-						print("numRelicSlots: " .. numRelicSlots)
-						for aw = 1, numRelicSlots do
-							local relicName, relicIcon, relicType, relicItemLink = C_ArtifactUI.GetRelicInfo(aw)
-							if relicName then
-								rilvl = checkRelicIlvl(relicItemLink)
-								print("relicName" .. aw .. ": " .. relicItemLink .. ", relicType" .. relicType .. ", ilvl: " .. rilvl)
-							else
-								print("relic slot " .. aw .. " is empty.")
-							end
+				local artifactID = lad:GetArtifactInfo()
+--				print("artifactID: " .. artifactID)
+				if weapon == artifactID then
+					local id, data = lad:GetArtifactRelics(artifactID)
+					for aw = 1, 3 do
+						if data[aw].name then
+							rilvl = checkRelicIlvl(data[aw].link)
+							print("relicName" .. aw .. ": " .. data[aw].link .. ", relicType" .. data[aw].type .. ", ilvl: " .. rilvl)
+						else
+							print("relic slot " .. aw .. " is empty.")
 						end
-					else
-						--print("weapon(" .. weapon .. ") and itemID(" .. itemID .. ") do not match.")
 					end
 				else
-					--print("Artifact not equipped.")
+					--print("weapon(" .. weapon .. ") and itemID(" .. itemID .. ") do not match.")
 				end
 			end
 		end
