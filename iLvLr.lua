@@ -346,7 +346,14 @@ function getIlvlTooltip(itemLink)
 		local ttScanner = iLvLrScanner
 		ttScanner:SetOwner(iLvLrFrame, "ANCHOR_NONE")
 		ttScanner:ClearLines()
-		ttScanner:SetHyperlink(itemLink)
+		if itemLink == nil or itemLink == "" or itemLink == "0" then
+			print("Hyperlink has not loaded fully yet.")
+		else
+			ttScanner:SetHyperlink(itemLink)
+			if ttScanner == nil then
+				print("Hyperlink has not loaded fully yet.")
+			end
+		end
 
 		local tname = ttScanner:GetName().."TextLeft%s";
 		for i = 2, ttScanner:NumLines() do
@@ -377,12 +384,19 @@ end
 
 function checkRelicIlvl(relicItemLink)
 	if relicItemLink then
-	if not iLvLrScanner then CreateFrame("GameToolTip", "iLvLrScanner", UIParent, "GameTooltipTemplate") end
-	local ttScanner = iLvLrScanner
-	
-	ttScanner:SetOwner(iLvLrFrame, "ANCHOR_NONE")
-	ttScanner:ClearLines()
-	ttScanner:SetHyperlink(relicItemLink)
+		if not iLvLrScanner then CreateFrame("GameToolTip", "iLvLrScanner", UIParent, "GameTooltipTemplate") end
+		local ttScanner = iLvLrScanner
+		
+		ttScanner:SetOwner(iLvLrFrame, "ANCHOR_NONE")
+		ttScanner:ClearLines()
+		if itemLink == nil or itemLink == "" or itemLink == "0" then
+			print("Hyperlink has not loaded fully yet.")
+		else
+			ttScanner:SetHyperlink(itemLink)
+			if ttScanner == nil then
+				print("Hyperlink has not loaded fully yet.")
+			end
+		end
 		for i = 1,4 do
 			if _G["iLvLrScannerTextLeft" .. i]:GetText() then
 				local rilvl = _G["iLvLrScannerTextLeft" .. i]:GetText():match(iLevelFilter);
@@ -489,7 +503,14 @@ function fetchSocketCount(slotName, unit)
 	
 	ttScanner:SetOwner(iLvLrFrame, "ANCHOR_NONE")
 	ttScanner:ClearLines()
-	ttScanner:SetHyperlink(itemLink)
+	if itemLink == nil or itemLink == "" or itemLink == "0" then
+		print("Hyperlink has not loaded fully yet.")
+	else
+		ttScanner:SetHyperlink(itemLink)
+		if ttScanner == nil then
+			print("Hyperlink has not loaded fully yet.")
+		end
+	end
 	
 	for i = 1, 4 do
 		local texture = _G["iLvLrScannerTexture" .. i]:GetTexture()
@@ -530,7 +551,14 @@ function fetchGem(slotName, unit)
 	
 	ttScanner:SetOwner(iLvLrFrame, "ANCHOR_NONE")
 	ttScanner:ClearLines()
-	ttScanner:SetHyperlink(itemLink)
+	if itemLink == nil or itemLink == "" or itemLink == "0" then
+		print("Hyperlink has not loaded fully yet.")
+	else
+		ttScanner:SetHyperlink(itemLink)
+		if ttScanner == nil then
+			print("Hyperlink has not loaded fully yet.")
+		end
+	end
 	
 	for i = 1, 4 do
 		local texture = _G["iLvLrScannerTexture" .. i]:GetTexture()
@@ -573,7 +601,6 @@ function fetchBaseSocket(slotName, unit)
 	
 	ttScanner:SetOwner(iLvLrFrame, "ANCHOR_NONE")
 	ttScanner:ClearLines()
-
 	if itemLink == nil or itemLink == "" or itemLink == "0" then
 		print("Hyperlink has not loaded fully yet.")
 	else
@@ -754,7 +781,7 @@ function makeIlvl(frame, slot, unit, iLevel, z)
 						for aw = 1, 3 do
 							if data[aw].name then
 								local rilvl = checkRelicIlvl(data[aw].link)
-								print("relicName" .. aw .. ": " .. data[aw].link .. ", relicType" .. data[aw].type .. ", ilvl: " .. rilvl)
+--								print("relicName" .. aw .. ": " .. data[aw].link .. ", relicType" .. data[aw].type .. ", ilvl: " .. rilvl)
 								local _,_,colour = string.find(data[aw].link, "|?c?f?f?(%x*)")
 								--print(colour)
 								if aw == 1 then
@@ -765,7 +792,7 @@ function makeIlvl(frame, slot, unit, iLevel, z)
 									iLvlAR3.text:SetFormattedText("|cff"..colour.."%i|r", rilvl)
 								end
 							else
-								print("relic slot " .. aw .. " is empty.")
+--								print("relic slot " .. aw .. " is empty.")
 							end
 						end
 						iLvlAR1Frame[slot] = iLvlAR1
