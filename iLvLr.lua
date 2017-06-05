@@ -89,6 +89,20 @@ local isEnchantableWoD = {"NeckSlot",
 							"Finger0Slot",
 							"Finger1Slot"
 							}
+
+local legionARSockets = {
+						["Arcane"] = "Arca",
+						["Blood"] = "Bloo",
+						["Fel"] = "Fel",
+						["Fire"] = "Fire",
+						["Frost"] = "Fros",
+						["Holy"] = "Holy",
+						["Iron"] = "Iron",
+						["Life"] = "Life",
+						["Shadow"] = "Shad",
+						["Wind"] = "Stor",
+						["Water"] = "Wate"
+						}
 					
 local iLevelFilter = ITEM_LEVEL:gsub( "%%d", "(%%d+)" )
 local lad = LibStub("LibArtifactData-1.0")
@@ -389,14 +403,14 @@ function checkRelicIlvl(relicItemLink)
 		
 		ttScanner:SetOwner(iLvLrFrame, "ANCHOR_NONE")
 		ttScanner:ClearLines()
-		if itemLink == nil or itemLink == "" or itemLink == "0" then
+		--[[if relicItemLink == nil or relicItemLink == "" or relicItemLink == "0" then
 			print("Hyperlink has not loaded fully yet.")
-		else
-			ttScanner:SetHyperlink(itemLink)
-			if ttScanner == nil then
+		else]]
+			ttScanner:SetHyperlink(relicItemLink)
+			--[[if ttScanner == nil then
 				print("Hyperlink has not loaded fully yet.")
 			end
-		end
+		end]]
 		for i = 1,4 do
 			if _G["iLvLrScannerTextLeft" .. i]:GetText() then
 				local rilvl = _G["iLvLrScannerTextLeft" .. i]:GetText():match(iLevelFilter);
@@ -691,9 +705,9 @@ function makeIlvl(frame, slot, unit, iLevel, z)
 				if not iLvlAR1 then
 					iLvlAR1 = CreateFrame("Frame", nil, frame)
 					if frame == CharacterMainHandSlot then
-						iLvlAR1:SetPoint("TOP", frame, "TOP", -35, 0)
+						iLvlAR1:SetPoint("TOPLEFT", frame, "TOPLEFT", -10, -8)
 					elseif frame == CharacterSecondaryHandSlot then
-						iLvlAR1:SetPoint("TOP", frame, "TOP", 35, 0)
+						iLvlAR1:SetPoint("TOPRIGHT", frame, "TOPRIGHT", 12, -8)
 					end
 
 					iLvlAR1:SetSize(10,10)
@@ -702,16 +716,20 @@ function makeIlvl(frame, slot, unit, iLevel, z)
 					
 					local iLvlAR1Text = iLvlAR1:CreateFontString(nil, "ARTWORK")
 					isValid = iLvlAR1Text:SetFont("Fonts\\FRIZQT__.TTF", 13, "OUTLINE")
-					iLvlAR1Text:SetPoint("CENTER", iLvlAR1, "CENTER", 0, 0)
+					if frame == CharacterMainHandSlot then
+						iLvlAR1Text:SetPoint("RIGHT", iLvlAR1, "RIGHT", 0, 0)
+					elseif frame == CharacterSecondaryHandSlot then
+						iLvlAR1Text:SetPoint("LEFT", iLvlAR1, "LEFT", 0, 0)
+					end
 					iLvlAR1.text = iLvlAR1Text
 				end
 
 				if not iLvlAR2 then
 					iLvlAR2 = CreateFrame("Frame", nil, frame)
 					if frame == CharacterMainHandSlot then
-						iLvlAR2:SetPoint("CENTER", frame, "CENTER", -35, 0)
+						iLvlAR2:SetPoint("LEFT", frame, "LEFT", -10, -8)
 					elseif frame == CharacterSecondaryHandSlot then
-						iLvlAR2:SetPoint("CENTER", frame, "CENTER", 35, 0)
+						iLvlAR2:SetPoint("RIGHT", frame, "RIGHT", 12, -8)
 					end
 
 					iLvlAR2:SetSize(10,10)
@@ -720,16 +738,20 @@ function makeIlvl(frame, slot, unit, iLevel, z)
 					
 					local iLvlAR2Text = iLvlAR2:CreateFontString(nil, "ARTWORK")
 					isValid = iLvlAR2Text:SetFont("Fonts\\FRIZQT__.TTF", 13, "OUTLINE")
-					iLvlAR2Text:SetPoint("CENTER", iLvlAR2, "CENTER", 0, 0)
+					if frame == CharacterMainHandSlot then
+						iLvlAR2Text:SetPoint("RIGHT", iLvlAR2, "RIGHT", 0, 0)
+					elseif frame == CharacterSecondaryHandSlot then
+						iLvlAR2Text:SetPoint("LEFT", iLvlAR2, "LEFT", 0, 0)
+					end
 					iLvlAR2.text = iLvlAR2Text
 				end
 
 				if not iLvlAR3 then
 					iLvlAR3 = CreateFrame("Frame", nil, frame)
 					if frame == CharacterMainHandSlot then
-						iLvlAR3:SetPoint("BOTTOM", frame, "BOTTOM", -35, 0)
+						iLvlAR3:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", -10, -8)
 					elseif frame == CharacterSecondaryHandSlot then
-						iLvlAR3:SetPoint("BOTTOM", frame, "BOTTOM", 35, 0)
+						iLvlAR3:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", 12, -8)
 					end
 
 					iLvlAR3:SetSize(10,10)
@@ -738,7 +760,11 @@ function makeIlvl(frame, slot, unit, iLevel, z)
 					
 					local iLvlAR3Text = iLvlAR3:CreateFontString(nil, "ARTWORK")
 					isValid = iLvlAR3Text:SetFont("Fonts\\FRIZQT__.TTF", 13, "OUTLINE")
-					iLvlAR3Text:SetPoint("CENTER", iLvlAR3, "CENTER", 0, 0)
+					if frame == CharacterMainHandSlot then
+						iLvlAR3Text:SetPoint("RIGHT", iLvlAR3, "RIGHT", 0, 0)
+					elseif frame == CharacterSecondaryHandSlot then
+						iLvlAR3Text:SetPoint("LEFT", iLvlAR3, "LEFT", 0, 0)
+					end
 					iLvlAR3.text = iLvlAR3Text
 				end
 
@@ -784,21 +810,32 @@ function makeIlvl(frame, slot, unit, iLevel, z)
 --								print("relicName" .. aw .. ": " .. data[aw].link .. ", relicType" .. data[aw].type .. ", ilvl: " .. rilvl)
 								local _,_,colour = string.find(data[aw].link, "|?c?f?f?(%x*)")
 								--print(colour)
+								local rtype
+--								print("data type: "..data[aw].type)
+								for k,v in pairs(legionARSockets) do
+									--print("k: "..k)
+									--print("v: "..v)
+									if k == data[aw].type then
+										rtype = v
+									--[[else
+										rtype = ""]]
+									end
+								end
 								if slot == "MainHandSlot" then
 									if aw == 1 then
-										iLvlAR1.text:SetFormattedText("%s |cff"..colour.."%i|r", data[aw].type, rilvl)
+										iLvlAR1.text:SetFormattedText("%s |cff"..colour.."%i|r", rtype, rilvl)
 									elseif aw == 2 then
-										iLvlAR2.text:SetFormattedText("%s |cff"..colour.."%i|r", data[aw].type, rilvl)
+										iLvlAR2.text:SetFormattedText("%s |cff"..colour.."%i|r", rtype, rilvl)
 									elseif aw == 3 then
-										iLvlAR3.text:SetFormattedText("%s |cff"..colour.."%i|r", data[aw].type, rilvl)
+										iLvlAR3.text:SetFormattedText("%s |cff"..colour.."%i|r", rtype, rilvl)
 									end
 								elseif slot == "SecondaryHandSlot" then
 									if aw == 1 then
-										iLvlAR1.text:SetFormattedText("|cff"..colour.."%i|r %s", rilvl, data[aw].type)
+										iLvlAR1.text:SetFormattedText("|cff"..colour.."%i|r %s", rilvl, rtype)
 									elseif aw == 2 then
-										iLvlAR2.text:SetFormattedText("|cff"..colour.."%i|r %s", rilvl, data[aw].type)
+										iLvlAR2.text:SetFormattedText("|cff"..colour.."%i|r %s", rilvl, rtype)
 									elseif aw == 3 then
-										iLvlAR3.text:SetFormattedText("|cff"..colour.."%i|r %s", rilvl, data[aw].type)
+										iLvlAR3.text:SetFormattedText("|cff"..colour.."%i|r %s", rilvl, rtype)
 									end
 								end
 							else
