@@ -667,7 +667,7 @@ function makeIlvl(frame, slot, unit, iLevel, z)
 			if frame == CharacterHeadSlot or frame == CharacterNeckSlot or frame == CharacterShoulderSlot or frame == CharacterBackSlot or frame == CharacterChestSlot or frame == CharacterWristSlot or frame == CharacterShirtSlot or frame == CharacterTabardSlot then
 				iLvl:SetPoint("CENTER", frame, "CENTER", 40, -1)
 			elseif frame == CharacterHandsSlot or frame == CharacterWaistSlot or frame == CharacterLegsSlot or frame == CharacterFeetSlot or frame == CharacterFinger0Slot or frame == CharacterFinger1Slot or frame == CharacterTrinket0Slot or frame == CharacterTrinket1Slot then
-				iLvl:SetPoint("CENTER", frame, "CENTER", -40, -1)
+				iLvl:SetPoint("CENTER", frame, "CENTER", -38, -1)
 			elseif frame == CharacterMainHandSlot or frame == CharacterSecondaryHandSlot then
 				iLvl:SetPoint("CENTER", frame, "CENTER", 0, 41)
 			end
@@ -705,9 +705,9 @@ function makeIlvl(frame, slot, unit, iLevel, z)
 				if not iLvlAR1 then
 					iLvlAR1 = CreateFrame("Frame", nil, frame)
 					if frame == CharacterMainHandSlot then
-						iLvlAR1:SetPoint("TOPLEFT", frame, "TOPLEFT", -10, -8)
+						iLvlAR1:SetPoint("TOPLEFT", frame, "TOPLEFT", -10, -2)
 					elseif frame == CharacterSecondaryHandSlot then
-						iLvlAR1:SetPoint("TOPRIGHT", frame, "TOPRIGHT", 12, -8)
+						iLvlAR1:SetPoint("TOPRIGHT", frame, "TOPRIGHT", 12, -2)
 					end
 
 					iLvlAR1:SetSize(10,10)
@@ -727,9 +727,9 @@ function makeIlvl(frame, slot, unit, iLevel, z)
 				if not iLvlAR2 then
 					iLvlAR2 = CreateFrame("Frame", nil, frame)
 					if frame == CharacterMainHandSlot then
-						iLvlAR2:SetPoint("LEFT", frame, "LEFT", -10, -8)
+						iLvlAR2:SetPoint("LEFT", frame, "LEFT", -10, -2)
 					elseif frame == CharacterSecondaryHandSlot then
-						iLvlAR2:SetPoint("RIGHT", frame, "RIGHT", 12, -8)
+						iLvlAR2:SetPoint("RIGHT", frame, "RIGHT", 12, -2)
 					end
 
 					iLvlAR2:SetSize(10,10)
@@ -749,9 +749,9 @@ function makeIlvl(frame, slot, unit, iLevel, z)
 				if not iLvlAR3 then
 					iLvlAR3 = CreateFrame("Frame", nil, frame)
 					if frame == CharacterMainHandSlot then
-						iLvlAR3:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", -10, -8)
+						iLvlAR3:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", -10, -2)
 					elseif frame == CharacterSecondaryHandSlot then
-						iLvlAR3:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", 12, -8)
+						iLvlAR3:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", 12, -2)
 					end
 
 					iLvlAR3:SetSize(10,10)
@@ -902,7 +902,7 @@ function makeDurability(frame, slot, unit)
 			if frame == CharacterHeadSlot or frame == CharacterNeckSlot or frame == CharacterShoulderSlot or frame == CharacterBackSlot or frame == CharacterChestSlot or frame == CharacterWristSlot or frame == CharacterShirtSlot or frame == CharacterTabardSlot then
 				iDura:SetPoint("BOTTOM", frame, "BOTTOM", 40, 0)
 			elseif frame == CharacterHandsSlot or frame == CharacterWaistSlot or frame == CharacterLegsSlot or frame == CharacterFeetSlot or frame == CharacterFinger0Slot or frame == CharacterFinger1Slot or frame == CharacterTrinket0Slot or frame == CharacterTrinket1Slot then
-				iDura:SetPoint("BOTTOM", frame, "BOTTOM", -40, 0)
+				iDura:SetPoint("BOTTOM", frame, "BOTTOM", -38, 0)
 			elseif frame == CharacterMainHandSlot or frame == CharacterSecondaryHandSlot then
 				iDura:SetPoint("BOTTOM", frame, "BOTTOM", 0, 42)
 			end
@@ -974,7 +974,7 @@ function makeMod(frame, slot, unit, iLevel)
 			if frame == CharacterHeadSlot or frame == CharacterNeckSlot or frame == CharacterShoulderSlot or frame == CharacterBackSlot or frame == CharacterChestSlot or frame == CharacterWristSlot or frame == CharacterShirtSlot or frame == CharacterTabardSlot then
 				iMod:SetPoint("TOP", frame, "TOP", 40, -3)
 			elseif frame == CharacterHandsSlot or frame == CharacterWaistSlot or frame == CharacterLegsSlot or frame == CharacterFeetSlot or frame == CharacterFinger0Slot or frame == CharacterFinger1Slot or frame == CharacterTrinket0Slot or frame == CharacterTrinket1Slot then
-				iMod:SetPoint("TOP", frame, "TOP", -40, -3)
+				iMod:SetPoint("TOP", frame, "TOP", -38, -3)
 			elseif frame == CharacterMainHandSlot or frame == CharacterSecondaryHandSlot then
 				iMod:SetPoint("TOP", frame, "TOP", 0, 39)
 			end
