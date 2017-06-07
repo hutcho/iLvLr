@@ -665,7 +665,7 @@ function makeIlvl(frame, slot, unit, iLevel, z)
 		iLvl = CreateFrame("Frame", nil, frame)
 		if unit == "player" then
 			if frame == CharacterHeadSlot or frame == CharacterNeckSlot or frame == CharacterShoulderSlot or frame == CharacterBackSlot or frame == CharacterChestSlot or frame == CharacterWristSlot or frame == CharacterShirtSlot or frame == CharacterTabardSlot then
-				iLvl:SetPoint("CENTER", frame, "CENTER", 40, -1)
+				iLvl:SetPoint("CENTER", frame, "CENTER", 38, -1)
 			elseif frame == CharacterHandsSlot or frame == CharacterWaistSlot or frame == CharacterLegsSlot or frame == CharacterFeetSlot or frame == CharacterFinger0Slot or frame == CharacterFinger1Slot or frame == CharacterTrinket0Slot or frame == CharacterTrinket1Slot then
 				iLvl:SetPoint("CENTER", frame, "CENTER", -38, -1)
 			elseif frame == CharacterMainHandSlot or frame == CharacterSecondaryHandSlot then
@@ -900,7 +900,7 @@ function makeDurability(frame, slot, unit)
 		
 		if unit == "player" then
 			if frame == CharacterHeadSlot or frame == CharacterNeckSlot or frame == CharacterShoulderSlot or frame == CharacterBackSlot or frame == CharacterChestSlot or frame == CharacterWristSlot or frame == CharacterShirtSlot or frame == CharacterTabardSlot then
-				iDura:SetPoint("BOTTOM", frame, "BOTTOM", 40, 0)
+				iDura:SetPoint("BOTTOM", frame, "BOTTOM", 38, 0)
 			elseif frame == CharacterHandsSlot or frame == CharacterWaistSlot or frame == CharacterLegsSlot or frame == CharacterFeetSlot or frame == CharacterFinger0Slot or frame == CharacterFinger1Slot or frame == CharacterTrinket0Slot or frame == CharacterTrinket1Slot then
 				iDura:SetPoint("BOTTOM", frame, "BOTTOM", -38, 0)
 			elseif frame == CharacterMainHandSlot or frame == CharacterSecondaryHandSlot then
@@ -972,7 +972,7 @@ function makeMod(frame, slot, unit, iLevel)
 		
 		if unit == "player" then
 			if frame == CharacterHeadSlot or frame == CharacterNeckSlot or frame == CharacterShoulderSlot or frame == CharacterBackSlot or frame == CharacterChestSlot or frame == CharacterWristSlot or frame == CharacterShirtSlot or frame == CharacterTabardSlot then
-				iMod:SetPoint("TOP", frame, "TOP", 40, -3)
+				iMod:SetPoint("TOP", frame, "TOP", 38, -3)
 			elseif frame == CharacterHandsSlot or frame == CharacterWaistSlot or frame == CharacterLegsSlot or frame == CharacterFeetSlot or frame == CharacterFinger0Slot or frame == CharacterFinger1Slot or frame == CharacterTrinket0Slot or frame == CharacterTrinket1Slot then
 				iMod:SetPoint("TOP", frame, "TOP", -38, -3)
 			elseif frame == CharacterMainHandSlot or frame == CharacterSecondaryHandSlot then
