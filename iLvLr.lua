@@ -10,7 +10,7 @@ local Title    = "|cff00ff00iLvLr|r"
 local Core     = "|cffFF45002|r"
 local Revision = "|cffFF45003|r"
 local Build    = "|cffFF4500305|r"
-SLASH_ILVLR1 = '/ilvlr'
+SLASH_ILVLR1   = '/ilvlr'
 
 local frameDB = {CharacterHeadSlot,
 					CharacterNeckSlot,
@@ -92,38 +92,38 @@ local isEnchantableWoD = {"NeckSlot",
 
 local legionARSockets = {
 						["Arcane"] = "Arca",
-						["Blood"] = "Bloo",
-						["Fel"] = "Fel",
-						["Fire"] = "Fire",
-						["Frost"] = "Fros",
-						["Holy"] = "Holy",
-						["Iron"] = "Iron",
-						["Life"] = "Life",
+						["Blood"]  = "Bloo",
+						["Fel"]    = "Fel",
+						["Fire"]   = "Fire",
+						["Frost"]  = "Fros",
+						["Holy"]   = "Holy",
+						["Iron"]   = "Iron",
+						["Life"]   = "Life",
 						["Shadow"] = "Shad",
-						["Wind"] = "Stor",
-						["Water"] = "Wate"
+						["Wind"]   = "Stor",
+						["Water"]  = "Wate"
 						}
 					
 local iLevelFilter = ITEM_LEVEL:gsub( "%%d", "(%%d+)" )
-local lad = LibStub("LibArtifactData-1.0")
+local lad          = LibStub("LibArtifactData-1.0")
 local iEqAvg, iAvg, lastInspecReady, InspecGUID
-local inspec = false
-local z = 0
-local iLvl = {}
-local iLvlAR1 = {}
-local iLvlAR2 = {}
-local iLvlAR3 = {}
-local relics = {}
-local mainSave = 0
-local mainISave = 0
-local offSave = 0
-local offISave = 0
-local iLvlFrames  = {}
+local inspec       = false
+local z            = 0
+local iLvl         = {}
+local iLvlAR1      = {}
+local iLvlAR2      = {}
+local iLvlAR3      = {}
+local relics       = {}
+local mainSave     = 0
+local mainISave    = 0
+local offSave      = 0
+local offISave     = 0
+local iLvlFrames   = {}
 local iLvlAR1Frame = {}
 local iLvlAR2Frame = {}
 local iLvlAR3Frame = {}
-local iDuraFrames = {}
-local iModFrames  = {}
+local iDuraFrames  = {}
+local iModFrames   = {}
 local iLvlIFrames  = {}
 local iDuraIFrames = {}
 local iModIFrames  = {}
@@ -188,7 +188,7 @@ function iLvLrOnEvent(self, event, what, what2)
 	if event == "ACTIVE_TALENT_GROUP_CHANGED" then
 --		print("Talent Change.")
 		mainSave = 0
-		offSave = 0
+		offSave  = 0
 --		print("Saves cleared.")
 	elseif event == "PLAYER_EQUIPMENT_CHANGED" then
 		iLvLrFrame:UnregisterEvent("PLAYER_EQUIPMENT_CHANGED")
@@ -387,9 +387,9 @@ end
 
 function fetchIlvl(slotName, unit)
 	--print("in fetchIlvl")
-	local slotId = GetInventorySlotInfo(slotName)
-	local itemLink = GetInventoryItemLink(unit, slotId)
-	local iLvl = getIlvlTooltip(itemLink)
+	local slotId    = GetInventorySlotInfo(slotName)
+	local itemLink  = GetInventoryItemLink(unit, slotId)
+	local iLvl      = getIlvlTooltip(itemLink)
 	--print("ttScanner iLvl: ", iLvl)
 	local itemlevel = iLvl
 
@@ -453,7 +453,7 @@ function calcIlvlAvg(unit)
 								elseif offISave > 750 then
 									if offISave > mainISave then
 										mainISave = offISave
-										iLevel = mainISave
+										iLevel    = mainISave
 									end
 								end
 --								print("Main Hand ilvl end: " .. iLevel)
@@ -465,7 +465,7 @@ function calcIlvlAvg(unit)
 								elseif mainISave > 750 then
 									if mainISave > offISave then
 										offISave = mainISave
-										iLevel = offISave
+										iLevel   = offISave
 									end
 								end
 --								print("Off Hand ilvl end: " .. iLevel)
@@ -474,7 +474,7 @@ function calcIlvlAvg(unit)
 					end
 				end
 				if (itemlevel and itemlevel > 0) then
-					item = item + 1
+					item  = item + 1
 					--print("items: " .. item)
 					total = total + itemlevel
 					--print("total: " .. total)
@@ -539,12 +539,12 @@ function fetchSocketCount(slotName, unit)
 end
 
 function fetchGem(slotName, unit)
-	local inventoryID = GetInventorySlotInfo(slotName)
-	local itemLink    = GetInventoryItemLink(unit, inventoryID)
+	local inventoryID   = GetInventorySlotInfo(slotName)
+	local itemLink      = GetInventoryItemLink(unit, inventoryID)
 	
-	local missingGems = 0
+	local missingGems   = 0
 							
-	local emptyTextures = {"Interface\\ItemSocketingFrame\\UI-EmptySocket-Meta", 
+	local emptyTextures = {"Interface\\ItemSocketingFrame\\UI-EmptySocket-Meta",
 							"Interface\\ItemSocketingFrame\\UI-EmptySocket-Red",
 							"Interface\\ItemSocketingFrame\\UI-EmptySocket-Yellow",
 							"Interface\\ItemSocketingFrame\\UI-EmptySocket-Blue",
@@ -592,7 +592,7 @@ end
 
 function fetchBaseSocket(slotName, unit)
 	local inventoryID = GetInventorySlotInfo(slotName)
-	local itemLink = GetInventoryItemLink(unit, inventoryID)
+	local itemLink    = GetInventoryItemLink(unit, inventoryID)
 	
 	local parsedItemDataTable = {}
 	local foundStart, foundEnd, parsedItemData = string.find(itemLink, "^|c%x+|H(.+)|h%[.*%]")
@@ -776,7 +776,7 @@ function makeIlvl(frame, slot, unit, iLevel, z)
 					elseif offSave > 750 then
 						if offSave > mainSave then
 							mainSave = offSave
-							iLevel = mainSave
+							iLevel   = mainSave
 						end
 					end
 --					print("Main Hand ilvl end: " .. iLevel)
@@ -788,13 +788,10 @@ function makeIlvl(frame, slot, unit, iLevel, z)
 					elseif mainSave > 750 then
 						if mainSave > offSave then
 							offSave = mainSave
-							iLevel = offSave
+							iLevel  = offSave
 						end
 					end
 --					print("Off Hand ilvl end: " .. iLevel)
-					iLvlAR1.text:SetText("")
-					iLvlAR2.text:SetText("")
-					iLvlAR3.text:SetText("")
 				end
 				if unit =="player" then
 					local artifactID = lad:GetArtifactInfo()
@@ -993,9 +990,9 @@ function makeMod(frame, slot, unit, iLevel)
 		iMod:SetBackdropColor(0,0,0,0)
 		
 		local iModText = iMod:CreateFontString(nil, "ARTWORK")
-		isValid = iModText:SetFont("Fonts\\FRIZQT__.TTF", 11, "OUTLINE")
+		isValid        = iModText:SetFont("Fonts\\FRIZQT__.TTF", 11, "OUTLINE")
 		iModText:SetPoint("CENTER", iMod, "CENTER", 0, 0)
-		iMod.text = iModText
+		iMod.text      = iModText
 		
 		missingGem     = fetchGem(slot, unit)
 		numSockets     = fetchSocketCount(slot, unit)
