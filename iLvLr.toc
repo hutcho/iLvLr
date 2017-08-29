@@ -1,7 +1,7 @@
-## Interface: 70200
+## Interface: 70300
 ## Title: |cff00ff00iLvLr|r
 ## Author: JerichoHM / LownIgnitus
-## Version: 2.3.305
+## Version: 2.3.306
 ## Notes: Tool to help gearing a character
 ## Dependancies:
 ## OptionalDeps: LibStub, CallbackHandler-1.0, LibArtifactData-1.0
