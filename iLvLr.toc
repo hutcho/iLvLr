@@ -1,11 +1,11 @@
 ## Interface: 70300
 ## Title: |cff00ff00iLvLr|r
 ## Author: JerichoHM / LownIgnitus
-## Version: 2.3.306
+## Version: 2.3.307
 ## Notes: Tool to help gearing a character
 ## Dependancies:
 ## OptionalDeps: LibStub, CallbackHandler-1.0, LibArtifactData-1.0
-## SavedVariablesPerCharacter: iDuraState, iColourState
+## SavedVariablesPerCharacter: iDuraState, iColourState, iRelicState, iRelicType
 
 Libs\LibStub\LibStub.lua
 Libs\CallbackHandler-1.0\CallbackHandler-1.0.lua
