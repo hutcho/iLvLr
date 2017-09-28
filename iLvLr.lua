@@ -768,6 +768,12 @@ function makeIlvl(frame, slot, unit, iLevel, z)
 							
 						iLvlAR3Text = iLvlAR3:CreateFontString(nil, "ARTWORK")
 					end
+					isValid = iLvlAR1Text:SetFont("Fonts\\FRIZQT__.TTF", 13, "OUTLINE")
+					iLvlAR1.text = iLvlAR1Text
+					isValid = iLvlAR2Text:SetFont("Fonts\\FRIZQT__.TTF", 13, "OUTLINE")
+					iLvlAR2.text = iLvlAR2Text
+					isValid = iLvlAR3Text:SetFont("Fonts\\FRIZQT__.TTF", 13, "OUTLINE")
+					iLvlAR3.text = iLvlAR3Text
 					if frame == CharacterMainHandSlot then
 						iLvlAR1:SetPoint("TOPRIGHT", frame, "TOPLEFT", 0, -2)
 						iLvlAR1Text:SetPoint("RIGHT", iLvlAR1, "RIGHT", 0, 0)
@@ -783,12 +789,6 @@ function makeIlvl(frame, slot, unit, iLevel, z)
 						iLvlAR3:SetPoint("BOTTOMLEFT", frame, "BOTTOMRIGHT", 1, -2)
 						iLvlAR3Text:SetPoint("LEFT", iLvlAR3, "LEFT", 0, 0)
 					end
-					isValid = iLvlAR1Text:SetFont("Fonts\\FRIZQT__.TTF", 13, "OUTLINE")
-					iLvlAR1.text = iLvlAR1Text
-					isValid = iLvlAR2Text:SetFont("Fonts\\FRIZQT__.TTF", 13, "OUTLINE")
-					iLvlAR2.text = iLvlAR2Text
-					isValid = iLvlAR3Text:SetFont("Fonts\\FRIZQT__.TTF", 13, "OUTLINE")
-					iLvlAR3.text = iLvlAR3Text
 
 					local artifactID = lad:GetArtifactInfo()
 					--print("artifactID: " .. artifactID)
