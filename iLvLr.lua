@@ -276,9 +276,11 @@ function iLvLrOnItemUpdate()
 		else
 			if iLvlFrames[v] then
 				iLvlFrames[v]:Hide()
-				iLvlAR1Frame[v]:Hide()
-				iLvlAR2Frame[v]:Hide()
-				iLvlAR3Frame[v]:Hide()
+				--[[if v == "MainHandSlot" or v == "SecondaryHandSlot" then
+					iLvlAR1Frame:Hide()
+					iLvlAR2Frame:Hide()
+					iLvlAR3Frame:Hide()
+				end]]
 			end
 			if iDuraFrames[v] then
 				iDuraFrames[v]:Hide()
