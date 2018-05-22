@@ -1,6 +1,6 @@
 -- Title: iLvLr
 -- Author: JerichoHM / LownIgnitus
--- Version: 2.3.306
+-- Version: 2.3.308
 -- Desc: iLvL identifier
 
 --Version Information
@@ -9,7 +9,7 @@ local addon    = iLvLr
 local Title    = "|cff00ff00iLvLr|r"
 local Core     = "|cffFF45002|r"
 local Revision = "|cffFF45003|r"
-local Build    = "|cffFF4500307|r"
+local Build    = "|cffFF4500308|r"
 SLASH_ILVLR1   = '/ilvlr'
 
 local frameDB = {CharacterHeadSlot,
@@ -30,26 +30,6 @@ local frameDB = {CharacterHeadSlot,
 					CharacterFinger1Slot,
 					CharacterTrinket0Slot,
 					CharacterTrinket1Slot
-				}
-
-local frameIDB = {InspectHeadSlot,
-					InspectNeckSlot,
-					InspectShoulderSlot,
-					InspectBackSlot,
-					InspectChestSlot,
-					InspectWristSlot,
-					InspectShirtSlot,
-					InspectTabardSlot,
-					InspectMainHandSlot,
-					InspectSecondaryHandSlot,
-					InspectHandsSlot,
-					InspectWaistSlot,
-					InspectLegsSlot,
-					InspectFeetSlot,
-					InspectFinger0Slot,
-					InspectFinger1Slot,
-					InspectTrinket0Slot,
-					InspectTrinket1Slot
 				}
 
 local slotDB = {"HeadSlot",
@@ -107,8 +87,7 @@ local legionARSockets = {
 local defaults = {
 					["iDuraState"] = true,
 					["iColourState"] = true,
-					["iRelicState"] = true,
-					["iRelicType"] = true
+					["iRelicState"] = true
 					}
 
 local iLevelFilter = ITEM_LEVEL:gsub( "%%d", "(%%d+)" )
@@ -116,7 +95,6 @@ local lad          = LibStub("LibArtifactData-1.0")
 local iEqAvg, iAvg, lastInspecReady, InspecGUID
 local inspec       = false
 local z            = 0
-local iLvl         = {}
 local iLvlAR1      = {}
 local iLvlAR2      = {}
 local iLvlAR3      = {}
@@ -134,9 +112,6 @@ local iLvlAR2Frame = {}
 local iLvlAR3Frame = {}
 local iDuraFrames  = {}
 local iModFrames   = {}
-local iLvlIFrames  = {}
-local iDuraIFrames = {}
-local iModIFrames  = {}
 local iLvLrReportFrame = CreateFrame("Frame", "iLvLrInspecFrame")
 iLvLrReportFrame:ClearAllPoints()
 iLvLrReportFrame:SetHeight(300)
@@ -147,7 +122,7 @@ iLvLrReportFrame.text:SetTextHeight(13)
 iLvLrReportFrame:SetAlpha(1)
 
 addon.f = CreateFrame("Frame", "iLvLrmain", CharacterFrame)
-addon.f:SetScript("OnShow", function(self, elapsed)
+addon.f:SetScript("OnShow", function(self)
 	--print("ILvLrOnLoad call @showpaperdoll")
 	iLvLrOnLoad()
 end)
@@ -159,29 +134,38 @@ function iLvLrMain()
 	iLvLrFrame:RegisterEvent("SOCKET_INFO_UPDATE")
 	iLvLrFrame:RegisterEvent("ITEM_UPGRADE_MASTER_UPDATE")
 	iLvLrFrame:RegisterEvent("INSPECT_READY")
---	iLvLrFrame:RegisterEvent("PLAYER_TARGET_CHANGED")
 	iLvLrFrame:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
 	iLvLrFrame:SetScript("OnEvent", iLvLrOnEvent)
 end
 
 function SlashCmdList.ILVLR(msg)
 	if msg == "durability" then
-		if iDuraState == "enabled" then
-			iDuraState = "disabled"
+		if iDuraState == true then
+			iDuraState = false
 			iDuraToggle(iDuraState)
 			print("Durability turned |cffff0000off|r!")
-		elseif iDuraState == "disabled" then
-			iDuraState = "enabled"
+		elseif iDuraState == false then
+			iDuraState = true
 			iDuraToggle(iDuraState)
 			print("Durability turned |cff00ff00on|r!")
 		end
 	elseif msg == "colour" then
-		if iColourState == "enabled" then
-			iColourState = "disabled"
+		if iColourState == true then
+			iColourState = false
 			print("ilvl colour turned |cffff0000off|r!")
-		elseif iColourState == "disabled" then
-			iColourState = "enabled"
+		elseif iColourState == false then
+			iColourState = true
 			print("ilvl colour turned |cff00ff00on|r!")
+		end
+	elseif msg == "relics" then
+		if iRelicState == true then
+			iRelicState = false
+			iRelicToggle(iRelicState)
+			print("relic information turned |cffff0000off|r!")
+		elseif iRelicState == false then
+			iRelicState = true
+			iRelicToggle(iRelicState)
+			print("relic information turned |cff00ff00on|r!")
 		end
 	else
 		print("Thank you for using " .. Title)
@@ -190,11 +174,12 @@ function SlashCmdList.ILVLR(msg)
 		print("Slash Commands are listed below and start with /iLvLr")
 		print("      durability - Disables or Enables the durability tracker")
 		print("      colour - Disables colouring ilvl by +/- avg")
+		print("      relics - Disables or Enables display of slotted relics in Artifact")
 	end
 end
 
 --Thanks to John454ss for code help
-function iLvLrOnEvent(self, event, what, what2)
+function iLvLrOnEvent(self, event, what)
 	if event == "ACTIVE_TALENT_GROUP_CHANGED" then
 --		print("Talent Change.")
 		mainSave = 0
@@ -221,7 +206,7 @@ function iLvLrOnEvent(self, event, what, what2)
 		iLvLrOnModUpdate()
 		iLvLrFrame:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
 	elseif event == "SOCKET_INFO_UPDATE" or event == "ITEM_UPGRADE_MASTER_UPDATE" then
-		--pront("Gem Change/Upgrade Update")
+		--print("Gem Change/Upgrade Update")
 		iLvLrOnItemUpdate()
 		iLvLrOnModUpdate()
 	elseif event == "UPDATE_INVENTORY_DURABILITY" then
@@ -241,23 +226,39 @@ function iLvLrOnLoad()
 			if v == "ShirtSlot" or v == "TabardSlot" then
 				-- Do Nothing
 			else
-				makeIlvl(frameDB[k], v, "player", iLevel)
-				makeDurability(frameDB[k], v, "player")
-				makeMod(frameDB[k], v, "player", iLevel)
+				makeIlvl(frameDB[k], v, iLevel)
+				makeDurability(frameDB[k], v)
+				makeMod(frameDB[k], v, iLevel)
 			end
 		end
 	end
 
 	if not iDuraState then
-		iDuraState = "enabled"
+		iDuraState = true
+	elseif iDuraState == "enabled" then
+		iDuraState = true
+	elseif iDuraState == "disabled" then
+		iDuraState = false
 	end
 
-	if iDuraState == "disabled" then
+	if iDuraState == false then
 		iDuraToggle(iDuraState)
 	end
 
 	if not iColourState then
-		iColourState = "enabled"
+		iColourState = true
+	elseif iColourState == "enabled" then
+		iColourState = true
+	elseif  iColourState == "disabled" then
+		iColourState = false
+	end
+
+	if not iRelicState then
+		iRelicState = true
+	end
+
+	if iRelicState == false then
+		iRelicToggle(iRelicState)
 	end
 end
 
@@ -269,18 +270,13 @@ function iLvLrOnItemUpdate()
 			if v == "ShirtSlot" or v == "TabardSlot" then
 				-- Do Nothing
 			else
-				makeIlvl(frameDB[k], v, "player", iLevel)
-				makeDurability(frameDB[k], v, "player")
-				makeMod(frameDB[k], v, "player", iLevel)
+				makeIlvl(frameDB[k], v, iLevel)
+				makeDurability(frameDB[k], v)
+				makeMod(frameDB[k], v, iLevel)
 			end
 		else
 			if iLvlFrames[v] then
 				iLvlFrames[v]:Hide()
-				--[[if v == "MainHandSlot" or v == "SecondaryHandSlot" then
-					iLvlAR1Frame:Hide()
-					iLvlAR2Frame:Hide()
-					iLvlAR3Frame:Hide()
-				end]]
 			end
 			if iDuraFrames[v] then
 				iDuraFrames[v]:Hide()
@@ -297,7 +293,7 @@ function iLvLrOnDuraUpdate()
 	for k ,v in pairs(slotDB) do
 		local iLevel = fetchIlvl(v, "player")
 		if iLevel then
-			makeDurability(frameDB[k], v, "player")
+			makeDurability(frameDB[k], v)
 		else
 			if iDuraFrames[v] then
 				iDuraFrames[v]:Hide()
@@ -313,7 +309,7 @@ function iLvLrOnModUpdate()
 			if v == "ShirtSlot" or v == "TabardSlot" then
 				-- Do Nothing
 			else
-				makeMod(frameDB[k], v, "player", iLevel)
+				makeMod(frameDB[k], v, iLevel)
 			end
 		else
 			if iModFrames[v] then
@@ -349,17 +345,6 @@ function iLvLInspecInit()
 			else
 				local iLevel = fetchIlvl(v, InspectFrame.unit)
 				--print(v .. " iLevel: " .. iLevel)
-				if iLevel then
-					makeIlvl(frameIDB[k], v, InspectFrame.unit, iLevel, z)
-					makeMod(frameIDB[k], v, InspectFrame.unit, iLevel)
-				else
-					if iLvlIFrames[v] then
-						iLvlIFrames[v]:Hide()
-					end
-					if iModIFrames[v] then
-						iModIFrames[v]:Hide()
-					end
-				end
 			end
 		end
 	end
@@ -514,9 +499,9 @@ function fetchDura(slotName)
 	end
 end
 
-function fetchSocketCount(slotName, unit)
+function fetchSocketCount(slotName)
 	local inventoryID = GetInventorySlotInfo(slotName)
-	local itemLink = GetInventoryItemLink(unit, inventoryID)
+	local itemLink = GetInventoryItemLink("player", inventoryID)
 	local socketCount = 0
 	for i = 1, 4 do
 		if  _G["iLvLrScannerTexture" .. i]  then
@@ -550,9 +535,9 @@ function fetchSocketCount(slotName, unit)
 	return socketCount
 end
 
-function fetchGem(slotName, unit)
+function fetchGem(slotName)
 	local inventoryID   = GetInventorySlotInfo(slotName)
-	local itemLink      = GetInventoryItemLink(unit, inventoryID)
+	local itemLink      = GetInventoryItemLink("player", inventoryID)
 	
 	local missingGems   = 0
 							
@@ -602,9 +587,9 @@ function fetchGem(slotName, unit)
 	return missingGems
 end
 
-function fetchBaseSocket(slotName, unit)
+function fetchBaseSocket(slotName)
 	local inventoryID = GetInventorySlotInfo(slotName)
-	local itemLink    = GetInventoryItemLink(unit, inventoryID)
+	local itemLink    = GetInventoryItemLink("player", inventoryID)
 	
 	local parsedItemDataTable = {}
 	local foundStart, foundEnd, parsedItemData = string.find(itemLink, "^|c%x+|H(.+)|h%[.*%]")
@@ -648,9 +633,9 @@ function fetchBaseSocket(slotName, unit)
 	return baseSocketCount
 end
 
-function fetchChant(slotName, unit)
+function fetchChant(slotName)
 	local inventoryID         = GetInventorySlotInfo(slotName)
-	local itemLink            = GetInventoryItemLink(unit, inventoryID)
+	local itemLink            = GetInventoryItemLink("player", inventoryID)
 	local parsedItemDataTable = {}
 	local _, itemId, enchantId, jewelId1, jewelId2, jewelId3, jewelId4, suffixId, uniqueId,
     linkLevel, specializationID, reforgeId, unknown1, unknown2 = strsplit(":", itemLink)
@@ -663,35 +648,21 @@ function fetchChant(slotName, unit)
 	end
 end
 
-function makeIlvl(frame, slot, unit, iLevel, z)
+function makeIlvl(frame, slot, iLevel)
 	--print("in makeText")
 	iAvg, iEqAvg = GetAverageItemLevel()
-	if unit == "player" then
-		iLvl = iLvlFrames[slot]
-	elseif unit ~= "player" then
-		iLvl = iLvlIFrames[slot]
-		--print("iLvlIFrames make")
-	end
-	--print("Unit: " .. unit .. ", Slot: " .. slot .. ", iLevel: " .. iLevel)
+	
+	local iLvl = iLvlFrames[slot]
+
+	--print("Slot: " .. slot .. ", iLevel: " .. iLevel)
 	if not iLvl then
 		iLvl = CreateFrame("Frame", nil, frame)
-		if unit == "player" then
-			if frame == CharacterHeadSlot or frame == CharacterNeckSlot or frame == CharacterShoulderSlot or frame == CharacterBackSlot or frame == CharacterChestSlot or frame == CharacterWristSlot or frame == CharacterShirtSlot or frame == CharacterTabardSlot then
-				iLvl:SetPoint("CENTER", frame, "CENTER", 38, -1)
-			elseif frame == CharacterHandsSlot or frame == CharacterWaistSlot or frame == CharacterLegsSlot or frame == CharacterFeetSlot or frame == CharacterFinger0Slot or frame == CharacterFinger1Slot or frame == CharacterTrinket0Slot or frame == CharacterTrinket1Slot then
-				iLvl:SetPoint("CENTER", frame, "CENTER", -38, -1)
-			elseif frame == CharacterMainHandSlot or frame == CharacterSecondaryHandSlot then
-				iLvl:SetPoint("CENTER", frame, "CENTER", 0, 41)
-			end
-		elseif unit ~= "player" then
-			--print("InspectPaperDollFrame " .. z)
-			if frame == InspectHeadSlot or frame == InspectNeckSlot or frame == InspectShoulderSlot or frame == InspectBackSlot or frame == InspectChestSlot or frame == InspectWristSlot or frame == InspectShirtSlot or frame == InspectTabardSlot then
-				iLvl:SetPoint("CENTER", frame, "CENTER", 42, -1)
-			elseif frame == InspectHandsSlot or frame == InspectWaistSlot or frame == InspectLegsSlot or frame == InspectFeetSlot or frame == InspectFinger0Slot or frame == InspectFinger1Slot or frame == InspectTrinket0Slot or frame == InspectTrinket1Slot then
-				iLvl:SetPoint("CENTER", frame, "CENTER", -42, -1)
-			elseif frame == InspectMainHandSlot or frame == InspectSecondaryHandSlot then
-				iLvl:SetPoint("CENTER", frame, "CENTER", 0, 41)
-			end
+		if frame == CharacterHeadSlot or frame == CharacterNeckSlot or frame == CharacterShoulderSlot or frame == CharacterBackSlot or frame == CharacterChestSlot or frame == CharacterWristSlot or frame == CharacterShirtSlot or frame == CharacterTabardSlot then
+			iLvl:SetPoint("CENTER", frame, "CENTER", 38, -1)
+		elseif frame == CharacterHandsSlot or frame == CharacterWaistSlot or frame == CharacterLegsSlot or frame == CharacterFeetSlot or frame == CharacterFinger0Slot or frame == CharacterFinger1Slot or frame == CharacterTrinket0Slot or frame == CharacterTrinket1Slot then
+			iLvl:SetPoint("CENTER", frame, "CENTER", -38, -1)
+		elseif frame == CharacterMainHandSlot or frame == CharacterSecondaryHandSlot then
+			iLvl:SetPoint("CENTER", frame, "CENTER", 0, 41)
 		end
 		
 		iLvl:SetSize(10,10)
@@ -703,10 +674,10 @@ function makeIlvl(frame, slot, unit, iLevel, z)
 		iLvlText:SetPoint("CENTER", iLvl, "CENTER", 0, 0)
 		iLvl.text = iLvlText
 	end
-
+		
 	if iLevel > 749 then
 		if slot == "MainHandSlot" or slot == "SecondaryHandSlot" then
-			local weapon = GetInventoryItemID(unit, GetInventorySlotInfo(slot))
+			local weapon = GetInventoryItemID("player", GetInventorySlotInfo(slot))
 			local name, _, itemRarity, _, _, _, itemSubType, _, _, _, _ = GetItemInfo(weapon)
 			--print("Slot: " .. slot .. ", itemRarity = " .. itemRarity .. ", name: " .. name .. ", itemID: " .. weapon)
 			if itemRarity == 6 then
@@ -736,7 +707,7 @@ function makeIlvl(frame, slot, unit, iLevel, z)
 					--print("Off Hand ilvl end: " .. iLevel)
 				end
 
-				if unit =="player" and itemSubType ~= "Fishing Poles" then
+				if iRelicState == true and itemSubType ~= "Fishing Poles" then
 					iLvlAR1 = iLvlAR1Frame[slot]
 					iLvlAR2 = iLvlAR2Frame[slot]
 					iLvlAR3 = iLvlAR3Frame[slot]
@@ -770,12 +741,18 @@ function makeIlvl(frame, slot, unit, iLevel, z)
 							
 						iLvlAR3Text = iLvlAR3:CreateFontString(nil, "ARTWORK")
 					end
+
 					isValid = iLvlAR1Text:SetFont("Fonts\\FRIZQT__.TTF", 13, "OUTLINE")
 					iLvlAR1.text = iLvlAR1Text
 					isValid = iLvlAR2Text:SetFont("Fonts\\FRIZQT__.TTF", 13, "OUTLINE")
 					iLvlAR2.text = iLvlAR2Text
 					isValid = iLvlAR3Text:SetFont("Fonts\\FRIZQT__.TTF", 13, "OUTLINE")
 					iLvlAR3.text = iLvlAR3Text
+
+					iLvlAR1.text:SetText("")
+					iLvlAR2.text:SetText("")
+					iLvlAR3.text:SetText("")
+
 					if frame == CharacterMainHandSlot then
 						iLvlAR1:SetPoint("TOPRIGHT", frame, "TOPLEFT", 0, -2)
 						iLvlAR1Text:SetPoint("RIGHT", iLvlAR1, "RIGHT", 0, 0)
@@ -794,9 +771,6 @@ function makeIlvl(frame, slot, unit, iLevel, z)
 
 					local artifactID = lad:GetArtifactInfo()
 					--print("artifactID: " .. artifactID)
-					iLvlAR1.text:SetText("")
-					iLvlAR2.text:SetText("")
-					iLvlAR3.text:SetText("")
 					if weapon == artifactID then
 						local id, data = lad:GetArtifactRelics(artifactID)
 						for aw = 1, 3 do
@@ -818,19 +792,43 @@ function makeIlvl(frame, slot, unit, iLevel, z)
 								end
 								if slot == "MainHandSlot" then
 									if aw == 1 then
-										iLvlAR1.text:SetFormattedText("%s |cff"..colour.."%i|r", rtype, rilvl)
+										if rtype ~= nil then
+											iLvlAR1.text:SetFormattedText("%s |cff"..colour.."%i|r", rtype, rilvl)
+										else
+											iLvlAR1.text:SetText("")
+										end
 									elseif aw == 2 then
-										iLvlAR2.text:SetFormattedText("%s |cff"..colour.."%i|r", rtype, rilvl)
+										if rtype ~= nil then
+											iLvlAR2.text:SetFormattedText("%s |cff"..colour.."%i|r", rtype, rilvl)
+										else
+											iLvlAR2.text:SetText("")
+										end
 									elseif aw == 3 then
-										iLvlAR3.text:SetFormattedText("%s |cff"..colour.."%i|r", rtype, rilvl)
+										if rtype ~= nil then
+											iLvlAR3.text:SetFormattedText("%s |cff"..colour.."%i|r", rtype, rilvl)
+										else
+											iLvlAR3.text:SetText("")
+										end
 									end
 								elseif slot == "SecondaryHandSlot" then
 									if aw == 1 then
-										iLvlAR1.text:SetFormattedText("|cff"..colour.."%i|r %s", rilvl, rtype)
+										if rtype ~= nil then
+											iLvlAR1.text:SetFormattedText("%s |cff"..colour.."%i|r", rtype, rilvl)
+										else
+											iLvlAR1.text:SetText("")
+										end
 									elseif aw == 2 then
-										iLvlAR2.text:SetFormattedText("|cff"..colour.."%i|r %s", rilvl, rtype)
+										if rtype ~= nil then
+											iLvlAR2.text:SetFormattedText("%s |cff"..colour.."%i|r", rtype, rilvl)
+										else
+											iLvlAR2.text:SetText("")
+										end
 									elseif aw == 3 then
-										iLvlAR3.text:SetFormattedText("|cff"..colour.."%i|r %s", rilvl, rtype)
+										if rtype ~= nil then
+											iLvlAR3.text:SetFormattedText("%s |cff"..colour.."%i|r", rtype, rilvl)
+										else
+											iLvlAR3.text:SetText("")
+										end
 									end
 								end
 							else
@@ -840,9 +838,6 @@ function makeIlvl(frame, slot, unit, iLevel, z)
 						iLvlAR1Frame[slot] = iLvlAR1
 						iLvlAR2Frame[slot] = iLvlAR2
 						iLvlAR3Frame[slot] = iLvlAR3
-						iLvlAR1:SetParent(PaperDollItemsFrame)
-						iLvlAR2:SetParent(PaperDollItemsFrame)
-						iLvlAR3:SetParent(PaperDollItemsFrame)
 						iLvlAR1:Show()
 						iLvlAR2:Show()
 						iLvlAR3:Show()
@@ -851,17 +846,19 @@ function makeIlvl(frame, slot, unit, iLevel, z)
 					iLvlAR2:Hide()
 					iLvlAR3:Hide()
 					end
-				else
+				--[[else
 					--print("weapon(" .. weapon .. ") and itemID(" .. itemID .. ") do not match.")
 					iLvlAR1:Hide()
 					iLvlAR2:Hide()
-					iLvlAR3:Hide()
+					iLvlAR3:Hide()]]
 				end
 			end
 		end
 	end
 
-	if iColourState == "enabled" then
+	--print("Slot " .. slot .. ": ilvl :")
+	--print(iLevel)
+	if iColourState == true then
 		if iLevel <= iEqAvg - 10 then
 			iLvl.text:SetFormattedText("|cffff0000%i|r", iLevel)
 		elseif iLevel >= iEqAvg + 10 then
@@ -869,51 +866,28 @@ function makeIlvl(frame, slot, unit, iLevel, z)
 		else
 			iLvl.text:SetFormattedText("|cffffffff%i|r", iLevel)
 		end
-	elseif iColourState == "disabled" then
+	elseif iColourState == false then
 		iLvl.text:SetFormattedText("|cffffffff%i|r", iLevel)
 	end
-	
 
-	if unit == "player" then
-		iLvlFrames[slot] = iLvl
-		iLvl:SetParent(PaperDollItemsFrame)
-	elseif unit ~= "player" then
-		iLvlIFrames[slot] = iLvl
-		iLvl:SetParent(InspectPaperDollFrame)
-		--print("iLvlIFrames save")
-	end
+	iLvlFrames[slot] = iLvl
 
 	iLvl:Show()
 end
 
-function makeDurability(frame, slot, unit)
+function makeDurability(frame, slot)
 	--print("in makeDurability")
-	local iDura = {}
-	if unit == "player" then
-		iDura = iDuraFrames[slot]
-	elseif unit ~= "player" then
-		iDura = iDuraIFrames[slot]
-	end
+	local iDura = iDuraFrames[slot]
 	if not iDura then
 		iDura = CreateFrame("Frame", nil, frame)
 		
-		if unit == "player" then
-			if frame == CharacterHeadSlot or frame == CharacterNeckSlot or frame == CharacterShoulderSlot or frame == CharacterBackSlot or frame == CharacterChestSlot or frame == CharacterWristSlot or frame == CharacterShirtSlot or frame == CharacterTabardSlot then
+		if frame == CharacterHeadSlot or frame == CharacterNeckSlot or frame == CharacterShoulderSlot or frame == CharacterBackSlot or frame == CharacterChestSlot or frame == CharacterWristSlot or frame == CharacterShirtSlot or frame == CharacterTabardSlot then
 				iDura:SetPoint("BOTTOM", frame, "BOTTOM", 38, 0)
 			elseif frame == CharacterHandsSlot or frame == CharacterWaistSlot or frame == CharacterLegsSlot or frame == CharacterFeetSlot or frame == CharacterFinger0Slot or frame == CharacterFinger1Slot or frame == CharacterTrinket0Slot or frame == CharacterTrinket1Slot then
 				iDura:SetPoint("BOTTOM", frame, "BOTTOM", -38, 0)
 			elseif frame == CharacterMainHandSlot or frame == CharacterSecondaryHandSlot then
 				iDura:SetPoint("BOTTOM", frame, "BOTTOM", 0, 42)
 			end
-		elseif unit ~= "player" then
-			if frame == InspectHeadSlot or frame == InspectNeckSlot or frame == InspectShoulderSlot or frame == InspectBackSlot or frame == InspectChestSlot or frame == InspectWristSlot or frame == InspectShirtSlot or frame == InspectTabardSlot then
-				iDura:SetPoint("BOTTOM", frame, "BOTTOM", 42, 0)
-			elseif frame == InspectHandsSlot or frame == InspectWaistSlot or frame == InspectLegsSlot or frame == InspectFeetSlot or frame == InspectFinger0Slot or frame == InspectFinger1Slot or frame == InspectTrinket0Slot or frame == InspectTrinket1Slot then
-				iDura:SetPoint("BOTTOM", frame, "BOTTOM", -42, 0)
-			elseif frame == InspectMainHandSlot or frame == InspectSecondaryHandSlot then
-				iDura:SetPoint("BOTTOM", frame, "BOTTOM", 0, 42)
-			end
-		end
 		
 		iDura:SetSize(10,10)
 		iDura:SetBackdrop({bgFile = nil, edgeFile = nil, tile = false, tileSize = 32, edgeSize = 0, insets = {left = 0, right = 0, top = 0, bottom = 0}})
@@ -923,9 +897,9 @@ function makeDurability(frame, slot, unit)
 		isValid = iDuraText:SetFont("Fonts\\FRIZQT__.TTF", 13, "OUTLINE")
 		iDuraText:SetPoint("CENTER", iDura, "CENTER", 0, 0)
 		iDura.text = iDuraText
-		itemDurability, itemMaxDurability = fetchDura(slot, unit)
+		itemDurability, itemMaxDurability = fetchDura(slot, "player")
 	else
-		itemDurability, itemMaxDurability = fetchDura(slot, unit)
+		itemDurability, itemMaxDurability = fetchDura(slot, "player")
 	end
 	
 	if itemDurability == -1 and itemMaxDurability == -1 then
@@ -943,49 +917,31 @@ function makeDurability(frame, slot, unit)
 		else
 			iDura.text:SetFormattedText("")
 		end
-		if unit == "player" then
-			iDuraFrames[slot] = iDura
-		elseif unit ~= "player" then
-			iDuraIFrames[slot] = iDura
-		end
+		iDuraFrames[slot] = iDura
 	end
 	
-    if iDuraState == "enabled" then
+    if iDuraState == true then
     	iDura:Show()
     end
 end
 
-function makeMod(frame, slot, unit, iLevel)
+function makeMod(frame, slot, iLevel)
 	--print("in makeMod")
 	local missingGem, numSockets, isEnchanted, canEnchant
 	local iMod   = {}
-	if unit == "player" then
-		iMod = iModFrames[slot]
-	elseif unit ~= "player" then
-		iMod = iModIFrames[slot]
-	end
---	local iLevel = fetchIlvl(slot, unit)
+	iMod = iModFrames[slot]
+--	local iLevel = fetchIlvl(slot, "player")
 --	print("Slot: " .. slot .. ", iLvL: " .. iLevel)
 	if not iMod then
 		iMod = CreateFrame("Frame", nil, frame)
 		
-		if unit == "player" then
-			if frame == CharacterHeadSlot or frame == CharacterNeckSlot or frame == CharacterShoulderSlot or frame == CharacterBackSlot or frame == CharacterChestSlot or frame == CharacterWristSlot or frame == CharacterShirtSlot or frame == CharacterTabardSlot then
+		if frame == CharacterHeadSlot or frame == CharacterNeckSlot or frame == CharacterShoulderSlot or frame == CharacterBackSlot or frame == CharacterChestSlot or frame == CharacterWristSlot or frame == CharacterShirtSlot or frame == CharacterTabardSlot then
 				iMod:SetPoint("TOP", frame, "TOP", 38, -3)
 			elseif frame == CharacterHandsSlot or frame == CharacterWaistSlot or frame == CharacterLegsSlot or frame == CharacterFeetSlot or frame == CharacterFinger0Slot or frame == CharacterFinger1Slot or frame == CharacterTrinket0Slot or frame == CharacterTrinket1Slot then
 				iMod:SetPoint("TOP", frame, "TOP", -38, -3)
 			elseif frame == CharacterMainHandSlot or frame == CharacterSecondaryHandSlot then
 				iMod:SetPoint("TOP", frame, "TOP", 0, 39)
 			end
-		elseif unit ~= "player" then
-			if frame == InspectHeadSlot or frame == InspectNeckSlot or frame == InspectShoulderSlot or frame == InspectBackSlot or frame == InspectChestSlot or frame == InspectWristSlot or frame == InspectShirtSlot or frame == InspectTabardSlot then
-				iMod:SetPoint("TOP", frame, "TOP", 42, -3)
-			elseif frame == InspectHandsSlot or frame == InspectWaistSlot or frame == InspectLegsSlot or frame == InspectFeetSlot or frame == InspectFinger0Slot or frame == InspectFinger1Slot or frame == InspectTrinket0Slot or frame == InspectTrinket1Slot then
-				iMod:SetPoint("TOP", frame, "TOP", -42, -3)
-			elseif frame == InspectMainHandSlot or frame == InspectSecondaryHandSlot then
-				iMod:SetPoint("TOP", frame, "TOP", 0, 39)
-			end
-		end
 
 		iMod:SetSize(10,10)
 		iMod:SetBackdrop({bgFile = nil, edgeFile = nil, tile = false, tileSize = 32, edgeSize = 0, insets = {left = 0, right = 0, top = 0, bottom = 0}})
@@ -996,13 +952,13 @@ function makeMod(frame, slot, unit, iLevel)
 		iModText:SetPoint("CENTER", iMod, "CENTER", 0, 0)
 		iMod.text      = iModText
 		
-		missingGem     = fetchGem(slot, unit)
-		numSockets     = fetchSocketCount(slot, unit)
+		missingGem     = fetchGem(slot)
+		numSockets     = fetchSocketCount(slot)
 		canEnchant     = false
 		missingSpecial = 0
 	else
-		missingGem     = fetchGem(slot, unit)
-		numSockets     = fetchSocketCount(slot, unit)
+		missingGem     = fetchGem(slot)
+		numSockets     = fetchSocketCount(slot)
 		canEnchant     = false
 		missingSpecial = 0
 	end
@@ -1011,7 +967,7 @@ function makeMod(frame, slot, unit, iLevel)
 		if slot == "WaistSlot" then
 			canEnchant = true
 
-			local baseSockets = fetchBaseSocket(slot, unit)
+			local baseSockets = fetchBaseSocket(slot)
 			if (baseSockets - numSockets) == -1 then
 				isEnchanted = 1
 			else
@@ -1021,38 +977,40 @@ function makeMod(frame, slot, unit, iLevel)
 			for k ,v in pairs(isEnchantable) do
 				if v == slot then
 					canEnchant = true
-					isEnchanted = fetchChant(slot, unit)
+					isEnchanted = fetchChant(slot)
 				end
 			end
 		end
 	elseif iLevel > 599 then
 		if slot == "SecondaryHandSlot" and iLevel < 749 then
-			local offHand = GetInventoryItemID(unit, GetInventorySlotInfo("SecondaryHandSlot"))
+			local offHand = GetInventoryItemID("player", GetInventorySlotInfo("SecondaryHandSlot"))
 			local _, _,itemRarity, _, _, itemClass, itemSubclass, _, _, _, _ = GetItemInfo(offHand)
 			if itemClass == "Weapon" or itemRarity == 7 then
 				canEnchant = true
-				isEnchanted = fetchChant(slot, unit)
+				isEnchanted = fetchChant(slot)
 			end
 			--print(itemClass)
 			--print(itemSubclass)
 		elseif iLevel > 749 then
-			local mainHand = GetInventoryItemID(unit, GetInventorySlotInfo("MainHandSlot"))
-			local _, _, itemRarity, _, _, itemClass, itemSubclass, _, _, _, _ = GetItemInfo(mainHand)
-			local _, englishClass, _ = UnitClass(unit)
-			if slot == "MainHandSlot" or slot == "SecondaryHandSlot" then
-				if itemClass == "Weapon" and itemRarity == 6 then
-					if englishClass == "DEATHKNIGHT" then
-						canEnchant = true
-						isEnchanted = fetchChant(slot, unit)
-					else
-						canEnchant = false
+			local mainHand = GetInventoryItemID("player", GetInventorySlotInfo("MainHandSlot"))
+			if mainHand ~= nil then
+				local _, _, itemRarity, _, _, itemClass, itemSubclass, _, _, _, _ = GetItemInfo(mainHand)
+				local _, englishClass, _ = UnitClass("player")
+				if slot == "MainHandSlot" or slot == "SecondaryHandSlot" then
+					if itemClass == "Weapon" and itemRarity == 6 then
+						if englishClass == "DEATHKNIGHT" then
+							canEnchant = true
+							isEnchanted = fetchChant(slot)
+						else
+							canEnchant = false
+						end
 					end
-				end
-			else 
-				for k ,v in pairs(isEnchantableWoD) do
-					if v == slot then
-						canEnchant = true
-						isEnchanted = fetchChant(slot, unit)
+				else 
+					for k ,v in pairs(isEnchantableWoD) do
+						if v == slot then
+							canEnchant = true
+							isEnchanted = fetchChant(slot)
+						end
 					end
 				end
 			end
@@ -1060,7 +1018,7 @@ function makeMod(frame, slot, unit, iLevel)
 			for k ,v in pairs(isEnchantable) do
 				if v == slot then
 					canEnchant = true
-					isEnchanted = fetchChant(slot, unit)
+					isEnchanted = fetchChant(slot)
 				end
 			end
 		end
@@ -1094,23 +1052,32 @@ function makeMod(frame, slot, unit, iLevel)
 		iMod.text:SetFormattedText("")
 	end
 		
-	if unit == "player" then
-		iModFrames[slot] = iMod
-	elseif unit ~= "player" then
-		iModIFrames[slot] = iMod
-	end
+	iModFrames[slot] = iMod
 		
 	iMod:Show()
 end
 
 function iDuraToggle(state)
 	for k, v in pairs(iDuraFrames) do
-		if state == "enabled" then
+		if state == true then
 			v:Show()
-		elseif state == "disabled" then
+		elseif state == false then
 			v:Hide()
 		end
 	end
+end
+
+function iRelicToggle(state)
+	if state == true then
+		iLvlAR1:Show()
+		iLvlAR2:Show()
+		iLvlAR3:Show()
+	elseif state == false and iLvlAR1 ~= null then
+		iLvlAR1:Hide()
+		iLvlAR2:Hide()
+		iLvlAR3:Hide()
+	end
+
 end
 
 local function onIUpdate(self, elapsed)
@@ -1121,5 +1088,6 @@ local function onIUpdate(self, elapsed)
 		end
 	end
 end
+
 iLvLrMain()
 iLvLrReportFrame:SetScript("OnUpdate", onIUpdate)
