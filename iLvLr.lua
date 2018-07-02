@@ -121,6 +121,52 @@ iLvLrReportFrame.text:SetAllPoints()
 iLvLrReportFrame.text:SetTextHeight(13)
 iLvLrReportFrame:SetAlpha(1)
 
+function iLvLrVariableCheck()
+	if not iDuraState then
+		iDuraState = true
+	elseif iDuraState then
+		if iDuraState == "enabled" then
+			iDuraState = true
+		elseif iDuraState == "disabled" then
+			iDuraState = false
+		end
+	else
+		-- do nothing
+	end
+
+	if iDuraState == false then
+		iDuraToggle(iDuraState)
+	end
+
+	if not iColourState then
+		iColourState = true
+	elseif iColourState then 
+		if iColourState == "enabled" then
+			iColourState = true
+		elseif  iColourState == "disabled" then
+			iColourState = false
+		end
+	else
+		-- do nothing
+	end
+
+	if not iRelicState then
+		iRelicState = true
+	elseif iRelicState then 
+		if iRelicState == "enabled" then
+			iRelicState = true
+		elseif  iRelicState == "disabled" then
+			iColourState = false
+		end
+	else
+		-- do nothing
+	end
+
+	if iRelicState == false then
+		iRelicToggle(iRelicState)
+	end
+end
+
 addon.f = CreateFrame("Frame", "iLvLrmain", CharacterFrame)
 addon.f:SetScript("OnShow", function(self)
 	--print("ILvLrOnLoad call @showpaperdoll")
@@ -129,6 +175,7 @@ end)
 				
 function iLvLrMain()
 	iLvLrFrame = CreateFrame("Frame", "iLvLrFrame", UIParent)
+	iLvLrFrame:RegisterEvent("ADDON_LOADED")
 	iLvLrFrame:RegisterEvent("UPDATE_INVENTORY_DURABILITY")
 	iLvLrFrame:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
 	iLvLrFrame:RegisterEvent("SOCKET_INFO_UPDATE")
@@ -180,7 +227,9 @@ end
 
 --Thanks to John454ss for code help
 function iLvLrOnEvent(self, event, what)
-	if event == "ACTIVE_TALENT_GROUP_CHANGED" then
+	if event == "ADDON_LOADED" then
+		iLvLrVariableCheck()
+	elseif event == "ACTIVE_TALENT_GROUP_CHANGED" then
 --		print("Talent Change.")
 		mainSave = 0
 		offSave  = 0
@@ -231,34 +280,6 @@ function iLvLrOnLoad()
 				makeMod(frameDB[k], v, iLevel)
 			end
 		end
-	end
-
-	if not iDuraState then
-		iDuraState = true
-	elseif iDuraState == "enabled" then
-		iDuraState = true
-	elseif iDuraState == "disabled" then
-		iDuraState = false
-	end
-
-	if iDuraState == false then
-		iDuraToggle(iDuraState)
-	end
-
-	if not iColourState then
-		iColourState = true
-	elseif iColourState == "enabled" then
-		iColourState = true
-	elseif  iColourState == "disabled" then
-		iColourState = false
-	end
-
-	if not iRelicState then
-		iRelicState = true
-	end
-
-	if iRelicState == false then
-		iRelicToggle(iRelicState)
 	end
 end
 
