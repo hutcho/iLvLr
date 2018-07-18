@@ -1,6 +1,6 @@
 -- Title: iLvLr
 -- Author: JerichoHM / LownIgnitus
--- Version: 2.3.308
+-- Version: 2.3.4
 -- Desc: iLvL identifier
 
 --Version Information
@@ -9,7 +9,7 @@ local addon    = iLvLr
 local Title    = "|cff00ff00iLvLr|r"
 local Core     = "|cffFF45002|r"
 local Revision = "|cffFF45003|r"
-local Build    = "|cffFF4500308|r"
+local Build    = "|cffFF45004|r"
 SLASH_ILVLR1   = '/ilvlr'
 
 local frameDB = {CharacterHeadSlot,
@@ -70,6 +70,11 @@ local isEnchantableWoD = {"NeckSlot",
 							"Finger1Slot"
 							}
 
+local isEnchantableBfA = {"Finger0Slot",
+							"Finger1Slot",
+							"MainHandSlot"
+							}
+
 local legionARSockets = {
 						["Arcane"] = "Arca",
 						["Blood"]  = "Bloo",
@@ -93,6 +98,7 @@ local defaults = {
 local iLevelFilter = ITEM_LEVEL:gsub( "%%d", "(%%d+)" )
 local lad          = LibStub("LibArtifactData-1.0")
 local iEqAvg, iAvg, lastInspecReady, InspecGUID
+
 local inspec       = false
 local z            = 0
 local iLvlAR1      = {}
@@ -112,6 +118,7 @@ local iLvlAR2Frame = {}
 local iLvlAR3Frame = {}
 local iDuraFrames  = {}
 local iModFrames   = {}
+
 local iLvLrReportFrame = CreateFrame("Frame", "iLvLrInspecFrame")
 iLvLrReportFrame:ClearAllPoints()
 iLvLrReportFrame:SetHeight(300)
@@ -457,7 +464,7 @@ function calcIlvlAvg(unit)
 				--print("in itemlink ~= nil")
 				local itemlevel = getIlvlTooltip(itemLink)
 				--print(itemlevel)
-				if itemlevel > 749 then
+				if itemlevel > 151 then
 					if slot == "MainHandSlot" or slot == "SecondaryHandSlot" then
 						local weapon = GetInventoryItemID(unit, GetInventorySlotInfo(slot))
 						local _, _, itemRarity, _, _, _, _, _, _, _, _ = GetItemInfo(weapon)
@@ -468,7 +475,7 @@ function calcIlvlAvg(unit)
 								mainISave = iLevel
 								if offISave == 0 then
 									offISave = mainISave
-								elseif offISave > 750 then
+								elseif offISave > 152 then
 									if offISave > mainISave then
 										mainISave = offISave
 										iLevel    = mainISave
@@ -480,7 +487,7 @@ function calcIlvlAvg(unit)
 								offISave = iLevel
 								if mainISave == 0 then
 									mainISave = offISave
-								elseif mainISave > 750 then
+								elseif mainISave > 152 then
 									if mainISave > offISave then
 										offISave = mainISave
 										iLevel   = offISave
@@ -696,7 +703,7 @@ function makeIlvl(frame, slot, iLevel)
 		iLvl.text = iLvlText
 	end
 		
-	if iLevel > 749 then
+	if iLevel > 151 then
 		if slot == "MainHandSlot" or slot == "SecondaryHandSlot" then
 			local weapon = GetInventoryItemID("player", GetInventorySlotInfo(slot))
 			local name, _, itemRarity, _, _, _, itemSubType, _, _, _, _ = GetItemInfo(weapon)
@@ -707,7 +714,7 @@ function makeIlvl(frame, slot, iLevel)
 					mainSave = iLevel
 					if offSave == 0 then
 						offSave = mainSave
-					elseif offSave > 750 then
+					elseif offSave > 152 then
 						if offSave > mainSave then
 							mainSave = offSave
 							iLevel   = mainSave
@@ -719,7 +726,7 @@ function makeIlvl(frame, slot, iLevel)
 					offSave = iLevel
 					if mainSave == 0 then
 						mainSave = offSave
-					elseif mainSave > 750 then
+					elseif mainSave > 152 then
 						if mainSave > offSave then
 							offSave = mainSave
 							iLevel  = offSave
@@ -984,7 +991,7 @@ function makeMod(frame, slot, iLevel)
 		missingSpecial = 0
 	end
 
-	if iLevel <= 599 then
+	if iLevel <= 136 then
 		if slot == "WaistSlot" then
 			canEnchant = true
 
@@ -1002,7 +1009,7 @@ function makeMod(frame, slot, iLevel)
 				end
 			end
 		end
-	elseif iLevel > 599 then
+	elseif iLevel > 136 then
 		if slot == "SecondaryHandSlot" and iLevel < 749 then
 			local offHand = GetInventoryItemID("player", GetInventorySlotInfo("SecondaryHandSlot"))
 			local _, _,itemRarity, _, _, itemClass, itemSubclass, _, _, _, _ = GetItemInfo(offHand)
@@ -1012,7 +1019,7 @@ function makeMod(frame, slot, iLevel)
 			end
 			--print(itemClass)
 			--print(itemSubclass)
-		elseif iLevel > 749 then
+		elseif iLevel > 151 then
 			local mainHand = GetInventoryItemID("player", GetInventorySlotInfo("MainHandSlot"))
 			if mainHand ~= nil then
 				local _, _, itemRarity, _, _, itemClass, itemSubclass, _, _, _, _ = GetItemInfo(mainHand)
