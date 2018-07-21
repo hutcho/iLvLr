@@ -1,15 +1,15 @@
 ## Interface: 80000
 ## Title: |cff00ff00iLvLr|r
 ## Author: JerichoHM / LownIgnitus
-## Version: 2.3.401
+## Version: 2.3.402
 ## Notes: Tool to help gearing a character
 ## Dependancies:
 ## SavedVariablesPerCharacter: iDuraState, iColourState, iRelicState
 
-@no-lib-strip@
+#@no-lib-strip@
 Libs\LibStub\LibStub.lua
 Libs\CallbackHandler-1.0\CallbackHandler-1.0.lua
 Libs\LibArtifactData-1.0\LibArtifactData-1.0.lua
-@end-no-lib-strip@
+#@end-no-lib-strip@
 
 iLvLr.lua
