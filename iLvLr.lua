@@ -1,6 +1,6 @@
 -- Title: iLvLr
 -- Author: JerichoHM / LownIgnitus
--- Version: 2.3.402
+-- Version: 2.3.403
 -- Desc: iLvL identifier
 
 --Version Information
@@ -72,7 +72,8 @@ local isEnchantableWoD = {"NeckSlot",
 
 local isEnchantableBfA = {"Finger0Slot",
 							"Finger1Slot",
-							"MainHandSlot"
+							"MainHandSlot",
+							"SecondaryHandSlot"
 							}
 
 local legionARSockets = {
@@ -408,6 +409,19 @@ function getIlvlTooltip(itemLink)
 		ttScanner:Hide()
 		return iLevel
 	end
+end
+
+function fetchProfs()
+	local prof1, prof2 = GetProfessions()
+	local profs = {prof1, prof2}
+	local profNames = {}
+	
+	for k, v in pairs(profs) do
+		local name = GetProfessionInfo(v)
+		tinsert(profNames, name)
+	end
+	
+	return profNames
 end
 
 function fetchIlvl(slotName, unit)
@@ -955,6 +969,7 @@ end
 
 function makeMod(frame, slot, iLevel)
 	--print("in makeMod")
+	local profNames = fetchProfs()
 	local missingGem, numSockets, isEnchanted, canEnchant
 	local iMod   = {}
 	iMod = iModFrames[slot]
@@ -1010,7 +1025,7 @@ function makeMod(frame, slot, iLevel)
 			end
 		end
 	elseif iLevel > 136 then
-		if slot == "SecondaryHandSlot" and iLevel < 749 then
+		if slot == "SecondaryHandSlot" and iLevel < 151 then
 			local offHand = GetInventoryItemID("player", GetInventorySlotInfo("SecondaryHandSlot"))
 			local _, _,itemRarity, _, _, itemClass, itemSubclass, _, _, _, _ = GetItemInfo(offHand)
 			if itemClass == "Weapon" or itemRarity == 7 then
@@ -1025,13 +1040,13 @@ function makeMod(frame, slot, iLevel)
 				local _, _, itemRarity, _, _, itemClass, itemSubclass, _, _, _, _ = GetItemInfo(mainHand)
 				local _, englishClass, _ = UnitClass("player")
 				if slot == "MainHandSlot" or slot == "SecondaryHandSlot" then
-					if itemClass == "Weapon" and itemRarity == 6 then
+					if itemClass == "Weapon" then
 						if englishClass == "DEATHKNIGHT" then
 							canEnchant = true
 							isEnchanted = fetchChant(slot)
-						else
-							canEnchant = false
 						end
+					else
+						canEnchant = false
 					end
 				else 
 					for k ,v in pairs(isEnchantableWoD) do
@@ -1039,6 +1054,35 @@ function makeMod(frame, slot, iLevel)
 							canEnchant = true
 							isEnchanted = fetchChant(slot)
 						end
+					end
+				end
+			end
+		elseif iLevel > 264 then
+			for k ,v in pairs(isEnchantableBfA) do
+				if v == slot then
+					canEnchant = true
+					isEnchanted = fetchChant(slot)
+				end
+			end
+			if slot == "WristSlot" then
+				for k, v in pairs(profNames) do
+					if v == "Enchanting" then
+						canEnchant = true
+						isEnchanted = fetchChant(slot)
+					end
+				end
+			elseif slot == "WaistSlot" then
+				for k, v in pairs(profNames) do
+					if v == "Engineering" then
+						canEnchant = true
+						isEnchanted = fetchChant(slot)
+					end
+				end
+			elseif slot == "BackSlot" then
+				for k, v in pairs(profNames) do
+					if v == "Tailoring" then
+						canEnchant = true
+						isEnchanted = fetchChant(slot)
 					end
 				end
 			end
