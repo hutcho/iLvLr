@@ -1,6 +1,6 @@
 -- Title: iLvLr
 -- Author: JerichoHM / LownIgnitus
--- Version: 2.3.403
+-- Version: 2.3.404
 -- Desc: iLvL identifier
 
 --Version Information
@@ -70,10 +70,11 @@ local isEnchantableWoD = {"NeckSlot",
 							"Finger1Slot"
 							}
 
-local isEnchantableBfA = {"Finger0Slot",
-							"Finger1Slot",
+local isEnchantableBfA = {"HandsSlot",
 							"MainHandSlot",
-							"SecondaryHandSlot"
+							"SecondaryHandSlot",
+							"Finger0Slot",
+							"Finger1Slot"
 							}
 
 local legionARSockets = {
@@ -1034,7 +1035,7 @@ function makeMod(frame, slot, iLevel)
 			end
 			--print(itemClass)
 			--print(itemSubclass)
-		elseif iLevel > 151 then
+		elseif iLevel > 151 and iLevel <265 then
 			local mainHand = GetInventoryItemID("player", GetInventorySlotInfo("MainHandSlot"))
 			if mainHand ~= nil then
 				local _, _, itemRarity, _, _, itemClass, itemSubclass, _, _, _, _ = GetItemInfo(mainHand)
