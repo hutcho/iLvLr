@@ -1,6 +1,6 @@
 -- Title: iLvLr
 -- Author: JerichoHM / LownIgnitus
--- Version: 2.3.404
+-- Version: 2.3.405
 -- Desc: iLvL identifier
 
 --Version Information
@@ -1059,13 +1059,18 @@ function makeMod(frame, slot, iLevel)
 				end
 			end
 		elseif iLevel > 264 then
-			for k ,v in pairs(isEnchantableBfA) do
-				if v == slot then
-					canEnchant = true
-					isEnchanted = fetchChant(slot)
+			if slot == "SecondaryHandSlot" then
+				local offHand = GetInventoryItemID("player", GetInventorySlotInfo("SecondaryHandSlot"))
+				local _, _, _, _, _, itemClass, _, _, _, _, _ = GetItemInfo(offHand)
+				if offhand ~= nil then
+					if itemClass ~= "Weapon" then
+						canEnchant = false
+					else
+						canEnchant = true
+						isEnchanted = fetchChant(slot)
+					end
 				end
-			end
-			if slot == "WristSlot" then
+			elseif slot == "WristSlot" then
 				for k, v in pairs(profNames) do
 					if v == "Enchanting" then
 						canEnchant = true
@@ -1082,6 +1087,13 @@ function makeMod(frame, slot, iLevel)
 			elseif slot == "BackSlot" then
 				for k, v in pairs(profNames) do
 					if v == "Tailoring" then
+						canEnchant = true
+						isEnchanted = fetchChant(slot)
+					end
+				end
+			else
+				for k ,v in pairs(isEnchantableBfA) do
+					if v == slot then
 						canEnchant = true
 						isEnchanted = fetchChant(slot)
 					end
