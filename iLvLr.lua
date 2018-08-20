@@ -1,6 +1,6 @@
 -- Title: iLvLr
 -- Author: JerichoHM / LownIgnitus
--- Version: 2.3.405
+-- Version: 2.3.406
 -- Desc: iLvL identifier
 
 --Version Information
@@ -131,9 +131,9 @@ iLvLrReportFrame.text:SetTextHeight(13)
 iLvLrReportFrame:SetAlpha(1)
 
 function iLvLrVariableCheck()
-	if not iDuraState then
+	if iDuraState == nil then
 		iDuraState = true
-	elseif iDuraState then
+	elseif iDuraState == "enabled" or iDuraState == "disabled" then
 		if iDuraState == "enabled" then
 			iDuraState = true
 		elseif iDuraState == "disabled" then
@@ -147,21 +147,21 @@ function iLvLrVariableCheck()
 		iDuraToggle(iDuraState)
 	end
 
-	if not iColourState then
+	if iColourState == nil then
 		iColourState = true
-	elseif iColourState then 
+	elseif iColourState == "enabled" or iColourState == "disabled" then 
 		if iColourState == "enabled" then
 			iColourState = true
 		elseif  iColourState == "disabled" then
 			iColourState = false
 		end
 	else
-		-- do nothing
+	-- do nothing
 	end
 
-	if not iRelicState then
+	if iRelicState == nil then
 		iRelicState = true
-	elseif iRelicState then 
+	elseif iRelicState == "enabled" or iRelicState == "disabled" then 
 		if iRelicState == "enabled" then
 			iRelicState = true
 		elseif  iRelicState == "disabled" then
@@ -1143,6 +1143,11 @@ function makeMod(frame, slot, iLevel)
 end
 
 function iDuraToggle(state)
+--[[	if iDuraState == false then
+		print("iDuraState = false.")
+	elseif iDuraState == true then
+		print("iDuraState = true.")
+	end]]
 	for k, v in pairs(iDuraFrames) do
 		if state == true then
 			v:Show()

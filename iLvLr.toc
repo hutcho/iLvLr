@@ -1,7 +1,7 @@
 ## Interface: 80000
 ## Title: |cff00ff00iLvLr|r
 ## Author: JerichoHM / LownIgnitus
-## Version: 2.3.405
+## Version: 2.3.406
 ## Notes: Tool to help gearing a character
 ## Dependancies:
 ## SavedVariablesPerCharacter: iDuraState, iColourState, iRelicState
