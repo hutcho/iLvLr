@@ -10,7 +10,7 @@ local Title    = "|cff00ff00iLvLr|r"
 local Core     = "|cffFF45002|r"
 local Revision = "|cffFF45003|r"
 local Build    = "|cffFF45004|r"
-SLASH_ILVLR1   = '/ilvlr'
+SLASH_ILVLR1, SLASH_ILVLR2   = '/ilvlr', '/iLvLr'
 
 local frameDB = {CharacterHeadSlot,
 					CharacterNeckSlot,
