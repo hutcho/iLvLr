@@ -1,6 +1,6 @@
 -- Title: iLvLr
 -- Author: JerichoHM / LownIgnitus
--- Version: 2.3.6
+-- Version: 2.3.7
 -- Desc: iLvL identifier
 
 --Version Information
