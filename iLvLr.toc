@@ -1,9 +1,9 @@
-## Interface: 80200
+## Interface: 80205
 ## Title: |cff00ff00iLvLr|r
 ## Author: |cffffcc00JerichoHM|r
 ## X-Maintainer: |cffDA70D6LownIgnitus|r Mihkael@US-Alexstrasza
-## Version: |cffFF45002.3.7|r
-## X-Date: 25/08/2019
+## Version: |cffFF45002.3.8|r
+## X-Date: 24/09/2019
 ## X-Website: https://github.com/lownignitus/iLvLr
 ## X-Contact: https://twitter.com/lownignitus
 ## Notes: Tool to help gearing a character
