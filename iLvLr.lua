@@ -1,6 +1,6 @@
 -- Title: iLvLr
 -- Author: JerichoHM / LownIgnitus
--- Version: 2.3.8
+-- Version: 2.3.9
 -- Desc: iLvL identifier
 
 --Version Information
@@ -1073,13 +1073,14 @@ function makeMod(frame, slot, iLevel)
 		elseif iLevel > 264 then
 			if slot == "SecondaryHandSlot" then
 				local offHand = GetInventoryItemID("player", GetInventorySlotInfo("SecondaryHandSlot"))
-				local _, _, _, _, _, itemClass, _, _, _, _, _ = GetItemInfo(offHand)
-				if offhand ~= nil then
-					if itemClass ~= "Weapon" then
-						canEnchant = false
-					else
+				-- itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = GetItemInfo()
+				local _, _, _, _, _, itemType, _, _, _, _, _ = GetItemInfo(offHand)
+				if offHand ~= nil then
+					if itemType == "Weapon" then
 						canEnchant = true
 						isEnchanted = fetchChant(slot)
+					else
+						canEnchant = false
 					end
 				end
 			elseif slot == "WristSlot" then
