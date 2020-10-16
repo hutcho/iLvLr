@@ -1,19 +1,13 @@
-## Interface: 80300
+## Interface: 900001
 ## Title: |cff00ff00iLvLr|r
 ## Author: |cffffcc00JerichoHM|r
 ## X-Maintainer: |cffDA70D6LownIgnitus|r Mihkael@US-Alexstrasza
-## Version: |cffFF45002.3.9|r
-## X-Date: 09/05/2019
+## Version: |cffFF45002.3.10|r
+## X-Date: 16/10/2020
 ## X-Website: https://github.com/lownignitus/iLvLr
 ## X-Contact: https://twitter.com/lownignitus
 ## Notes: Tool to help gearing a character
 ## Dependancies:
 ## SavedVariablesPerCharacter: iLvLrSettings, iDuraState, iColourState, iRelicState
-
-#@no-lib-strip@
-Libs\LibStub\LibStub.lua
-Libs\CallbackHandler-1.0\CallbackHandler-1.0.lua
-Libs\LibArtifactData-1.0\LibArtifactData-1.0.lua
-#@end-no-lib-strip@
 
 iLvLr.lua
