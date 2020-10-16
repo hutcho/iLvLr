@@ -1,4 +1,4 @@
-## Interface: 900001
+## Interface: 90001
 ## Title: |cff00ff00iLvLr|r
 ## Author: |cffffcc00JerichoHM|r
 ## X-Maintainer: |cffDA70D6LownIgnitus|r Mihkael@US-Alexstrasza
