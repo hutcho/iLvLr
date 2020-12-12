@@ -9,8 +9,8 @@ local addon = iLvLr
 local ADDON_NAME = "iLvLr"
 local Title = "|cff00ff00iLvLr|r"
 local Core = "|cffFF45002|r"
-local Revision = "|cffFF45003|r"
-local Build = "|cffFF450010|r"
+local Revision = "|cffFF45004|r"
+local Build = "|cffFF45000|r"
 SLASH_ILVLR1, SLASH_ILVLR2 = '/ilvlr', '/iLvLr'
 
 local frameDB = {CharacterHeadSlot,
@@ -77,29 +77,6 @@ local isEnchantableBfA = {"HandsSlot",
 							"Finger0Slot",
 							"Finger1Slot"
 							}
-
-local isEnchantableSL = {"BackSlot",
-							"ChestSlot",
-							"WristSlot",
-							"MainHandSlot",
-							"HandsSlot",
-							"FeetSlot",
-							"Finger0Slot",
-							"Finger1Slot"
-							}
-
-local dualWield = {251, -- Frost DK
-					577, -- Havoc
-					581, -- Vengeance
-					103, -- Feral
-					268, -- Brewmaster
-					296, -- Windwalker
-					259, -- Assassination
-					260, -- Outlaw
-					261, -- Subtlety
-					263, -- Enhancement
-					72, -- Fury
-					}
 
 local iLevelFilter = "^" .. gsub(ITEM_LEVEL, "%%d", "(%%d+)")
 local iEqAvg, iAvg
@@ -176,7 +153,7 @@ function iLvLrMain()
 	iLvLrFrame:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
 	iLvLrFrame:RegisterEvent("SOCKET_INFO_UPDATE")
 	iLvLrFrame:RegisterEvent("ITEM_UPGRADE_MASTER_UPDATE")
-	iLvLrFrame:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
+	iLvLrFrame:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
 	iLvLrFrame:SetScript("OnEvent", iLvLrOnEvent)
 end
 
@@ -213,7 +190,7 @@ end
 function iLvLrOnEvent(self, event, what)
 	if event == "ADDON_LOADED" then
 		iLvLrVariableCheck()
-	elseif event == "PLAYER_SPECIALIZATION_CHANGED" then
+	elseif event == "ACTIVE_TALENT_GROUP_CHANGED" then
 --		print("Talent Change.")
 		mainSave = 0
 		offSave  = 0
@@ -253,8 +230,10 @@ function iLvLrOnLoad()
 	for k ,v in pairs(slotDB) do
 		--print("k: " .. k .. ", v: " .. v)
 		local iLevel = fetchIlvl(v, "player")
-		if iLevel ~= nil then
+		if iLevel then
 			if v == "ShirtSlot" or v == "TabardSlot" then
+				-- Do Nothing
+			elseif iLevel == "" then
 				-- Do Nothing
 			else
 				makeIlvl(frameDB[k], v)
@@ -269,8 +248,10 @@ function iLvLrOnItemUpdate()
 	--print("in OnItemUpdate")
 	for k ,v in pairs(slotDB) do
 		local iLevel = fetchIlvl(v, "player")
-		if iLevel ~= nil then
+		if iLevel then
 			if v == "ShirtSlot" or v == "TabardSlot" then
+				-- Do Nothing
+			elseif iLevel == "" then
 				-- Do Nothing
 			else
 				makeIlvl(frameDB[k], v)
@@ -396,6 +377,27 @@ do
 	end
 end
 
+function GetItemLinkInfo(link)
+	local itemColor, itemString, itemName
+	if ( link ) then
+		itemColor, itemString, itemName = link:match("(|c%x+)|Hitem:([-%d:]+)|h%[(.-)%]|h|r");
+	end
+	return itemName, itemString, itemColor
+end
+
+function SplitString(seperator, value)
+	local list = {}
+	gsub(value..seperator, "([^"..seperator.."]*)"..seperator, function(v) table.insert(list, v) end);
+	return list
+end
+
+function SplitValue(value)
+	if ( value == "" ) then
+		value = "0"
+	end
+	return tonumber(value)
+end
+
 function getIlvlTooltip(itemLink)
 	local iLevel = 0
 	if(itemLink and type(itemLink) == "string") then
@@ -404,11 +406,11 @@ function getIlvlTooltip(itemLink)
 		ttScanner:SetOwner(iLvLrFrame, "ANCHOR_NONE")
 		ttScanner:ClearLines()
 		if itemLink == nil or itemLink == "" or itemLink == "0" then
-			--print("Hyperlink has not loaded fully yet.")
+			print("Hyperlink has not loaded fully yet.")
 		else
 			ttScanner:SetHyperlink(itemLink)
 			if ttScanner == nil then
-				--print("Hyperlink has not loaded fully yet.")
+				print("Hyperlink has not loaded fully yet.")
 			end
 		end
 
@@ -449,9 +451,6 @@ function fetchIlvl(slotName, unit)
 		local itemString = string.match(itemLink, "item[%-?%d:]+")
 		local _,_,_,itemLevel,_, _, _, _, _, _, _ = GetItemInfo(itemString)
 		--print("ttScanner iLvl: ", itemLevel)
-		return itemLevel
-	else
-		itemLevel = ""
 		return itemLevel
 	end
 	
@@ -504,90 +503,35 @@ end
 function fetchSocketCount(slotName)
 	local itemLink = GetInventoryItemLink("player", GetInventorySlotInfo(slotName))
 	local socketCount = 0
-	for i = 1, 10 do
-		if  _G["iLvLrScannerTexture" .. i]  then
-	 		_G["iLvLrScannerTexture" .. i]:SetTexture("")
-	 	end
-	end
 	
-	if not iLvLrScanner then CreateFrame("GameToolTip", "iLvLrScanner", UIParent, "GameTooltipTemplate") end
-	local ttScanner = iLvLrScanner
-	
-	ttScanner:SetOwner(iLvLrFrame, "ANCHOR_NONE")
-	ttScanner:ClearLines()
-	if itemLink == nil or itemLink == "" or itemLink == "0" then
-		--print("Hyperlink has not loaded fully yet.")
-	else
-		ttScanner:SetHyperlink(itemLink)
-		if ttScanner == nil then
-			--print("Hyperlink has not loaded fully yet.")
-		end
-	end
-	
-	for i = 1, 10 do
-		local texture = _G["iLvLrScannerTexture" .. i]:GetTexture()
-		if texture then
-			socketCount = socketCount + 1
-		end
-	end
-	
-	ttScanner:Hide()
-	
+	local stats = GetItemStats(itemLink)
+
+	socketCount = (stats["EMPTY_SOCKET_RED"] or 0) +
+					(stats["EMPTY_SOCKET_YELLOW"] or 0) +
+					(stats["EMPTY_SOCKET_BLUE"] or 0) +
+					(stats["EMPTY_SOCKET_META"] or 0) +
+					(stats["EMPTY_SOCKET_PRISMATIC"] or 0)
+
 	return socketCount
 end
 
 function fetchGem(slotName)
 	local itemLink      = GetInventoryItemLink("player", GetInventorySlotInfo(slotName))
-	
-	local missingGems   = 0
+	local foundGems   = 0
 							
-	local emptyTextures = {"Interface\\ItemSocketingFrame\\UI-EmptySocket",
-						   "Interface\\ItemSocketingFrame\\UI-EmptySocket-Blue",
-						   "Interface\\ItemSocketingFrame\\UI-EmptySocket-CogWheel",						   
-						   "Interface\\ItemSocketingFrame\\UI-EmptySocket-Hydraulic",
-						   "Interface\\ItemSocketingFrame\\UI-EmptySocket-Meta",
-						   "Interface\\ItemSocketingFrame\\UI-EmptySocket-Prismatic",
-						   "Interface\\ItemSocketingFrame\\UI-EmptySocket-PunchcardBlue",
-						   "Interface\\ItemSocketingFrame\\UI-EmptySocket-PunchcardRed",
-						   "Interface\\ItemSocketingFrame\\UI-EmptySocket-PunchcardYellow",
-						   "Interface\\ItemSocketingFrame\\UI-EmptySocket-Red",
-						   "Interface\\ItemSocketingFrame\\UI-EmptySocket-Yellow"
-							}
+	local _, itemString, _ = GetItemLinkInfo(itemLink)
+	local ids = SplitString(":", itemString)
+	local gem1 = SplitValue(ids[3])
+	local gem2 = SplitValue(ids[4])
+	local gem3 = SplitValue(ids[5])
+	local gem4 = SplitValue(ids[6])
+
+	if gem1 > 0 then foundGems = foundGems + 1 end
+	if gem2 > 0 then foundGems = foundGems + 1 end
+	if gem3 > 0 then foundGems = foundGems + 1 end
+	if gem4 > 0 then foundGems = foundGems + 1 end
 	
-	for i = 1, 10 do
-		if ( _G["iLvLrScannerTexture" .. i] ) then
-	 		_G["iLvLrScannerTexture" .. i]:SetTexture("");
-	 	end;
-	end;
-	
-	if not iLvLrScanner then CreateFrame("GameToolTip", "iLvLrScanner", UIParent, "GameTooltipTemplate") end
-	local ttScanner = iLvLrScanner
-	
-	ttScanner:SetOwner(iLvLrFrame, "ANCHOR_NONE")
-	ttScanner:ClearLines()
-	if itemLink == nil or itemLink == "" or itemLink == "0" then
-		--print("Hyperlink has not loaded fully yet.")
-	else
-		ttScanner:SetHyperlink(itemLink)
-		if ttScanner == nil then
-			--print("Hyperlink has not loaded fully yet.")
-		end
-	end
-	
-	for i = 1, 10 do
-		local texture = _G["iLvLrScannerTexture" .. i]:GetTexture()
-		if texture then
-			for k, v in pairs(emptyTextures) do
-				if texture == v then
-					missingGems = missingGems + 1
-				end
-			end
-		end
-	end
-	
-	ttScanner:Hide()
-	
-	return missingGems
+	return foundGems
 end
 
 function fetchBaseSocket(slotName)
@@ -615,11 +559,11 @@ function fetchBaseSocket(slotName)
 	ttScanner:SetOwner(iLvLrFrame, "ANCHOR_NONE")
 	ttScanner:ClearLines()
 	if itemLink == nil or itemLink == "" or itemLink == "0" then
-		--print("Hyperlink has not loaded fully yet.")
+		print("Hyperlink has not loaded fully yet.")
 	else
 		ttScanner:SetHyperlink(itemLink)
 		if ttScanner == nil then
-			--print("Hyperlink has not loaded fully yet.")
+			print("Hyperlink has not loaded fully yet.")
 		end
 	end
 	
@@ -679,19 +623,13 @@ function makeIlvl(frame, slotName)
 	local itemLink = GetInventoryItemLink("player", GetInventorySlotInfo(slotName))
 	local iLevel = getIlvlTooltip(itemLink)
 
-	if iLevel == nil then
-		iLevel = ""
-	end
-
 	--print("Slot " .. slotName .. ": ilvl :")
 	--print(iLevel)
 	if iColourState == true then
-		if iLevel == "" then
-			iLvl.text:SetFormattedText(iLevel)
+		if iLevel <= iEqAvg - 10 then
+			iLvl.text:SetFormattedText("|cffff0000%i|r", iLevel)
 		elseif iLevel >= iEqAvg + 10 then
 			iLvl.text:SetFormattedText("|cff00ff00%i|r", iLevel)
-		elseif iLevel <= iEqAvg - 10 then
-			iLvl.text:SetFormattedText("|cffff0000%i|r", iLevel)
 		else
 			iLvl.text:SetFormattedText("|cffffffff%i|r", iLevel)
 		end
@@ -757,13 +695,10 @@ end
 function makeMod(frame, slot)
 	--print("in makeMod")
 	local profNames = fetchProfs()
-	local missingGem, numSockets, isEnchanted, canEnchant
+	local foundGems, numSockets, isEnchanted, canEnchant
 	local iMod   = {}
 	iMod = iModFrames[slot]
 	local iLevel = fetchIlvl(slot, "player")
-	local _, englishClass, _ = UnitClass("player")
-	local specIndex = GetSpecialization()
-	local specID = GetSpecializationInfo(specIndex) 
 	--print("Slot: " .. slot .. ", iLvL: " .. iLevel)
 	if not iMod then
 		iMod = CreateFrame("Frame", nil, frame, "BackdropTemplate")
@@ -786,12 +721,12 @@ function makeMod(frame, slot)
 		iMod.text      = iModText
 	end	
 
-	missingGem = fetchGem(slot)
+	foundGems = fetchGem(slot)
 	numSockets = fetchSocketCount(slot)
 	canEnchant = false
 	missingSpecial = 0
 	
-	if iLevel ~= "" and iLevel <= 50 then
+	if iLevel <= 50 then
 		if slot == "WaistSlot" then
 			canEnchant = true
 
@@ -809,7 +744,7 @@ function makeMod(frame, slot)
 				end
 			end
 		end
-	elseif iLevel ~= "" and iLevel > 20 then
+	elseif iLevel > 20 then
 		if slot == "SecondaryHandSlot" and iLevel < 151 then
 			local offHand = GetInventoryItemID("player", GetInventorySlotInfo("SecondaryHandSlot"))
 			local _, _,itemRarity, _, _, itemClass, itemSubclass, _, _, _, _ = GetItemInfo(offHand)
@@ -819,10 +754,11 @@ function makeMod(frame, slot)
 			end
 			--print(itemClass)
 			--print(itemSubclass)
-		elseif iLevel > 48 and iLevel < 61 then
+		elseif iLevel > 48 and iLevel <61 then
 			local mainHand = GetInventoryItemID("player", GetInventorySlotInfo("MainHandSlot"))
 			if mainHand ~= nil then
 				local _, _, _, _, _, itemClass, _, _, _, _, _ = GetItemInfo(mainHand)
+				local _, englishClass, _ = UnitClass("player")
 				if slot == "MainHandSlot" or slot == "SecondaryHandSlot" then
 					if itemClass == "Weapon" then
 						if englishClass == "DEATHKNIGHT" then
@@ -841,7 +777,7 @@ function makeMod(frame, slot)
 					end
 				end
 			end
-		elseif iLevel > 60 and iLevel < 141 then
+		elseif iLevel > 60 then
 			if slot == "SecondaryHandSlot" then
 				local offHand = GetInventoryItemID("player", GetInventorySlotInfo("SecondaryHandSlot"))
 				-- itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = GetItemInfo()
@@ -876,23 +812,7 @@ function makeMod(frame, slot)
 					end
 				end
 			else
-				for k ,v in pairs(isEnchantableSL) do
-					if v == slot then
-						canEnchant = true
-						isEnchanted = fetchChant(slot)
-					end
-				end
-			end
-		elseif iLevel > 140 then
-			if slot == "SecondaryHandSlot" then
-				for k,v in pairs(dualWield) do
-					if v == specID then
-						canEnchant = true
-						isEnchanted = fetchChant(slot)
-					end
-				end
-			else
-				for k,v in pairs(isEnchantableSL) do
+				for k ,v in pairs(isEnchantableBfA) do
 					if v == slot then
 						canEnchant = true
 						isEnchanted = fetchChant(slot)
@@ -900,7 +820,7 @@ function makeMod(frame, slot)
 				end
 			end
 		else 
-			for k,v in pairs(isEnchantable) do
+			for k ,v in pairs(isEnchantable) do
 				if v == slot then
 					canEnchant = true
 					isEnchanted = fetchChant(slot)
@@ -912,19 +832,19 @@ function makeMod(frame, slot)
 	isEnchanted = tonumber(isEnchanted)
 		
 	if numSockets > 0 and canEnchant == true then
-		if isEnchanted == 0 and missingGem > 0 then -- Missing (Red) Enchant and Gem
+		if isEnchanted == 0 and foundGems < numSockets then -- Missing (Red) Enchant and Gem
 			iMod.text:SetFormattedText("|cffff0000%s|r|cffff0000%s|r", "E", "G")
-		elseif isEnchanted == 0 and missingGem == 0 then -- Missing (Red) Enchant, Found (Green) Gem
+		elseif isEnchanted == 0 and foundGems == numSockets then -- Missing (Red) Enchant, Found (Green) Gem
 			iMod.text:SetFormattedText("|cffff0000%s|r|cff00ff00%s|r", "E", "G")
-		elseif isEnchanted > 0 and missingGem > 0 then -- Found (Green) Enchant, Missing(Red) Gem
+		elseif isEnchanted > 0 and foundGems < numSockets then -- Found (Green) Enchant, Missing(Red) Gem
 			iMod.text:SetFormattedText("|cff00ff00%s|r|cffff0000%s|r", "E", "G")
-		elseif isEnchanted > 0 and missingGem == 0 then -- Found (Green) Enchant and Gem
+		elseif isEnchanted > 0 and foundGems == numSockets then -- Found (Green) Enchant and Gem
 			iMod.text:SetFormattedText("|cff00ff00%s|r|cff00ff00%s|r", "E", "G")
 		end
 	elseif numSockets > 0 and canEnchant == false then
-		if missingGem > 0 then -- Missing (Red) Gem
+		if foundGems < numSockets then -- Missing (Red) Gem
 			iMod.text:SetFormattedText("|cffff0000%s|r", "G")
-		elseif missingGem == 0 then -- Found (Green) Gem
+		elseif foundGems == numSockets then -- Found (Green) Gem
 			iMod.text:SetFormattedText("|cff00ff00%s|r", "G")
 		end
 	elseif numSockets == 0 and canEnchant == true then
