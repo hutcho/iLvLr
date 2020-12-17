@@ -1,6 +1,6 @@
 -- Title: iLvLr
 -- Author: JerichoHM / LownIgnitus
--- Version: 2.4.1
+-- Version: 2.4.2
 -- Desc: iLvL identifier
 
 --Version Information
@@ -10,7 +10,7 @@ local ADDON_NAME = "iLvLr"
 local Title = "|cff00ff00iLvLr|r"
 local Core = "|cffFF45002|r"
 local Revision = "|cffFF45004|r"
-local Build = "|cffFF45001|r"
+local Build = "|cffFF45002|r"
 SLASH_ILVLR1, SLASH_ILVLR2 = '/ilvlr', '/iLvLr'
 
 local frameDB = {CharacterHeadSlot,
@@ -77,6 +77,29 @@ local isEnchantableBfA = {"HandsSlot",
 							"Finger0Slot",
 							"Finger1Slot"
 							}
+
+							local isEnchantableSL = {"BackSlot",
+							"ChestSlot",
+							"WristSlot",
+							"MainHandSlot",
+							"HandsSlot",
+							"FeetSlot",
+							"Finger0Slot",
+							"Finger1Slot"
+							}
+
+local dualWield = {251, -- Frost DK
+					577, -- Havoc
+					581, -- Vengeance
+					103, -- Feral
+					268, -- Brewmaster
+					296, -- Windwalker
+					259, -- Assassination
+					260, -- Outlaw
+					261, -- Subtlety
+					263, -- Enhancement
+					72, -- Fury
+					}
 
 local iLevelFilter = "^" .. gsub(ITEM_LEVEL, "%%d", "(%%d+)")
 local iEqAvg, iAvg
@@ -305,78 +328,6 @@ function iLvLrOnModUpdate()
 	end
 end
 
---[[ Unified tooltip scanner; Insperation: Phanx @ https://www.wowinterface.com/forums/showpost.php?p=319704&postcount=2 
-& https://www.wowinterface.com/forums/showpost.php?p=270331&postcount=6]]
-local iLvLrScanner2
-do
-	-- Generate a unique name for the tooltip:
-	local tooltipName = ADDON_NAME .. "ScanningTooltip" .. random(100000, 10000000)
-
-	-- Create the hidden tooltip object:
-	local tooltip = CreateFrame("GameTooltip", tooltipName, UIParent, "GameTooltipTemplate")
-	tooltip:SetOwner(UIParent, "ANCHOR_NONE")
-
-	-- Build a list of the tooltip's texture objects:
-	local textures = {}
-	for i = 1, 10 do
-		textures[i] = _G[tooltipName .. "Texture" .. i]
-	end
-
-	-- tooltip scan filters
-	local S_ITEM_LEVEL = "^" .. gsub(ITEM_LEVEL, "%%d", "(%%d+)")
-	local S_UPGRADE_LEVEL = "^" .. gsub(ITEM_UPGRADE_TOOLTIP_FORMAT, "%%d", "(%%d+)")
-	local S_ENCHANTED_TOOLTIP_LINE = "^" .. gsub(ENCHANTED_TOOLTIP_LINE, "%%s", "(.+)")
-
-	-- Expose the API:
-	function GetTooltipScan(itemLink, getSockets, getGem, getUpgrade, canEnchant)
-		-- if no itemLink then exit
-		if not itemLink then return end
-
-		-- Pass itemLink to tooltip
-		tooltip:SetHyperlink(itemLink)
-
-		-- Build list of shown textures 
-		local n = {}
-		for i = 1, 10 do
-			if textures[i]:IsShown() then
-				n[#n + 1] = textures[i]:GetTexture()
-			end
-		end
-
-		local actualItemLevel, upgradeLevel, maxUpgrade, numSockets, missingGems, isEnchanted, currentEnchant
-		-- Scan tooltip, line 1 in name, skip
-		for i = 2, tooltip:NumLines() do
-			local text = _G[tooltipName .. "TextLeft" .. i]:GetText()
-			if text and text ~= "" then
-				if getSockets then
-					numSockets = #n
-					return numSockets			
-				elseif getGem then
-					if strmatch(text, "+(%d+)") then -- Looking for Gem/Cog/Punchcard entry
-						return text
-					elseif strmatch(text, _G.ITEM_SPELL_TRIGGER_ONEQUIP) then -- "Equip:" check for Punch Cards
-						return strmatch(text, _G.ITEM_SPELL_TRIGGER_ONEQUIP .. " (.+)")
-					end
-				elseif strmatch(text, S_ITEM_LEVEL) then
-					actualItemLevel = strmatch(text, S_ITEM_LEVEL)
-					return actualItemLevel
-				elseif getUpgrade and strmatch(text, S_UPGRADE_LEVEL) then
-					upgradeLevel, maxUpgrade = strmatch(text, S_UPGRADE_LEVEL)
-					return upgradeLevel, maxUpgrade
-				elseif canEnchant and strmatch(text, S_ENCHANTED_TOOLTIP_LINE) then
-					currentEnchant = strmatch(text, S_ENCHANTED_TOOLTIP_LINE)
-					if currentEnchant ~= nil then
-						isEnchanted = true
-					else
-						isEnchanted = false
-					end
-					return isEnchanted, currentEnchant
-				end
-			end
-		end
-	end
-end
-
 function GetItemLinkInfo(link)
 	local itemColor, itemString, itemName
 	if ( link ) then
@@ -399,92 +350,40 @@ function SplitValue(value)
 end
 
 function getIlvlTooltip(itemLink)
-	local iLevel = 0
-	if(itemLink and type(itemLink) == "string") then
-		if not iLvLrScanner then CreateFrame("GameToolTip", "iLvLrScanner", UIParent, "GameTooltipTemplate") end
-		local ttScanner = iLvLrScanner
-		ttScanner:SetOwner(iLvLrFrame, "ANCHOR_NONE")
-		ttScanner:ClearLines()
-		if itemLink == nil or itemLink == "" or itemLink == "0" then
-			print("Hyperlink has not loaded fully yet.")
-		else
-			ttScanner:SetHyperlink(itemLink)
-			if ttScanner == nil then
-				print("Hyperlink has not loaded fully yet.")
-			end
-		end
-
-		local tname = ttScanner:GetName().."TextLeft%s";
-		for i = 2, ttScanner:NumLines() do
-			local text = _G[tname:format(i)]:GetText()
-			if(text and text ~= "") then
-				local value = tonumber(text:match(iLevelFilter))
-				if(value) then
-					iLevel = value
-				end
-			end
-		end
-
-		ttScanner:Hide()
-		return iLevel
-	end
-end
-
-function fetchProfs()
-	local prof1, prof2 = GetProfessions()
-	local profs = {prof1, prof2}
-	local profNames = {}
-	
-	for k, v in pairs(profs) do
-		local name = GetProfessionInfo(v)
-		tinsert(profNames, name)
-	end
-	
-	return profNames
-end
-
-function fetchIlvl(slotName, unit)
-	--print("in fetchIlvl")
-	local itemLink = GetInventoryItemLink(unit, GetInventorySlotInfo(slotName))
-	
+	--print("In getIlvlToolyip")
 	if itemLink ~= nil then
-		local itemString = string.match(itemLink, "item[%-?%d:]+")
-		local _,_,_,itemLevel,_, _, _, _, _, _, _ = GetItemInfo(itemString)
-		--print("ttScanner iLvl: ", itemLevel)
-		return itemLevel
+		local effectiveILvl, isPreview, baseILvl = GetDetailedItemLevelInfo(itemLink)
+		return effectiveILvl
 	end
 	
 	return ""
 end
 
-function calcIlvlAvg(unit)
-	--print("in calc")
-	local total = 0
-	local item = 0
-	for k ,v in pairs(slotDB) do
-		--print(v)
-		if v == "ShirtSlot" or v == "TabardSlot" then
-			-- Do Nothing
-		else
-			local itemLink = GetInventoryItemLink(unit, GetInventorySlotInfo(v))
-			if (itemLink ~= nil) then
-				--print("in itemlink ~= nil")
-				local itemlevel = getIlvlTooltip(itemLink)
-				--print(itemlevel)
-				if (itemlevel and itemlevel > 0) then
-					item  = item + 1
-					--print("items: " .. item)
-					total = total + itemlevel
-					--print("total: " .. total)
-				end
-			end
-		end
+function fetchProfs()
+	local prof1, prof2 = GetProfessions()
+	local profs = {prof1, prof2}
+	local profIDs = {}
+	
+	for k, v in pairs(profs) do
+		local _,_,_,_,_,_,skillID = GetProfessionInfo(v)
+		tinsert(profIDs, skillID)
 	end
+	
+	return profIDs
+end
 
-	if (total < 1) then
-		return 0
+function fetchIlvl(slotName, unit)
+	--print("in fetchIlvl")
+	--print(slotName)
+	local itemLink = GetInventoryItemLink(unit, GetInventorySlotInfo(slotName))
+	
+	if itemLink ~= nil then
+		local effectiveILvl, isPreview, baseILvl = GetDetailedItemLevelInfo(itemLink)
+		--print(effectiveILvl)
+		return effectiveILvl
 	end
-	return floor((total / item) + 0.5)
+	
+	return ""
 end
 
 function fetchDura(slotName)
@@ -595,7 +494,7 @@ end
 
 function makeIlvl(frame, slotName)
 	--print("in makeText")
-	iAvg, iEqAvg = GetAverageItemLevel()
+	iAvg, iEqAvg,iAvgPvp = GetAverageItemLevel()
 	
 	local iLvl = iLvlFrames[slotName]
 
@@ -694,11 +593,14 @@ end
 
 function makeMod(frame, slot)
 	--print("in makeMod")
-	local profNames = fetchProfs()
+	local profIDs = fetchProfs() -- 164 Blacksmith, 333 Enchanting, 202 Engineer, 182 Herbalism, 186 Mining, 393 Skining, 197 Tailoring
 	local foundGems, numSockets, isEnchanted, canEnchant
 	local iMod   = {}
 	iMod = iModFrames[slot]
 	local iLevel = fetchIlvl(slot, "player")
+	local _, englishClass, _ = UnitClass("player")
+	local specIndex = GetSpecialization()
+	local specID = GetSpecializationInfo(specIndex) 
 	--print("Slot: " .. slot .. ", iLvL: " .. iLevel)
 	if not iMod then
 		iMod = CreateFrame("Frame", nil, frame, "BackdropTemplate")
@@ -726,7 +628,7 @@ function makeMod(frame, slot)
 	canEnchant = false
 	missingSpecial = 0
 	
-	if iLevel <= 50 then
+	if iLevel  ~= "" and iLevel <= 50 then
 		if slot == "WaistSlot" then
 			canEnchant = true
 
@@ -744,7 +646,7 @@ function makeMod(frame, slot)
 				end
 			end
 		end
-	elseif iLevel > 20 then
+	elseif iLevel ~= "" and iLevel > 20 then
 		if slot == "SecondaryHandSlot" and iLevel < 151 then
 			local offHand = GetInventoryItemID("player", GetInventorySlotInfo("SecondaryHandSlot"))
 			local _, _,itemRarity, _, _, itemClass, itemSubclass, _, _, _, _ = GetItemInfo(offHand)
@@ -754,7 +656,7 @@ function makeMod(frame, slot)
 			end
 			--print(itemClass)
 			--print(itemSubclass)
-		elseif iLevel > 48 and iLevel <61 then
+		elseif iLevel > 48 and iLevel < 61 then
 			local mainHand = GetInventoryItemID("player", GetInventorySlotInfo("MainHandSlot"))
 			if mainHand ~= nil then
 				local _, _, _, _, _, itemClass, _, _, _, _, _ = GetItemInfo(mainHand)
@@ -777,7 +679,7 @@ function makeMod(frame, slot)
 					end
 				end
 			end
-		elseif iLevel > 60 then
+		elseif iLevel > 60 and iLevel < 141 then
 			if slot == "SecondaryHandSlot" then
 				local offHand = GetInventoryItemID("player", GetInventorySlotInfo("SecondaryHandSlot"))
 				-- itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = GetItemInfo()
@@ -791,22 +693,22 @@ function makeMod(frame, slot)
 					end
 				end
 			elseif slot == "WristSlot" then
-				for k, v in pairs(profNames) do
-					if v == "Enchanting" then
+				for k, v in pairs(profIDs) do
+					if v == 333 then
 						canEnchant = true
 						isEnchanted = fetchChant(slot)
 					end
 				end
 			elseif slot == "WaistSlot" then
-				for k, v in pairs(profNames) do
-					if v == "Engineering" then
+				for k, v in pairs(profIDs) do
+					if v == 202 then
 						canEnchant = true
 						isEnchanted = fetchChant(slot)
 					end
 				end
 			elseif slot == "BackSlot" then
-				for k, v in pairs(profNames) do
-					if v == "Tailoring" then
+				for k, v in pairs(profIDs) do
+					if v == 197 then
 						canEnchant = true
 						isEnchanted = fetchChant(slot)
 					end
@@ -819,7 +721,35 @@ function makeMod(frame, slot)
 					end
 				end
 			end
-		else 
+		elseif iLevel > 140 then
+			if slot == "SecondaryHandSlot" then
+				for k,v in pairs(dualWield) do
+					if v == specID then
+						canEnchant = true
+						isEnchanted = fetchChant(slot)
+					end
+				end
+			elseif slot == "HandsSlot" then				
+				canEnchant = false
+				if englishClass == "DEATHKNIGHT" or englishClass == "WARRIOR" or englishClass == "PALADIN" then
+					canEnchant = true
+					isEnchanted = fetchChant(slot)
+				end
+				for k,v in pairs(profIDs) do
+					if v == 182 or v == 186 or v == 393 then
+						canEnchant = true
+						isEnchanted = fetchChant(slot)
+					end
+				end
+			else
+				for k,v in pairs(isEnchantableSL) do
+					if v == slot then
+						canEnchant = true
+						isEnchanted = fetchChant(slot)
+					end
+				end
+			end
+		else  
 			for k ,v in pairs(isEnchantable) do
 				if v == slot then
 					canEnchant = true
