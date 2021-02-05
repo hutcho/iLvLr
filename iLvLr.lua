@@ -1,6 +1,6 @@
 -- Title: iLvLr
 -- Author: JerichoHM / LownIgnitus
--- Version: 2.4.2
+-- Version: 2.4.3
 -- Desc: iLvL identifier
 
 --Version Information
@@ -78,7 +78,7 @@ local isEnchantableBfA = {"HandsSlot",
 							"Finger1Slot"
 							}
 
-							local isEnchantableSL = {"BackSlot",
+local isEnchantableSL = {"BackSlot",
 							"ChestSlot",
 							"WristSlot",
 							"MainHandSlot",
@@ -256,8 +256,6 @@ function iLvLrOnLoad()
 		if iLevel then
 			if v == "ShirtSlot" or v == "TabardSlot" then
 				-- Do Nothing
-			elseif iLevel == "" then
-				-- Do Nothing
 			else
 				makeIlvl(frameDB[k], v)
 				makeDurability(frameDB[k], v)
@@ -273,8 +271,6 @@ function iLvLrOnItemUpdate()
 		local iLevel = fetchIlvl(v, "player")
 		if iLevel then
 			if v == "ShirtSlot" or v == "TabardSlot" then
-				-- Do Nothing
-			elseif iLevel == "" then
 				-- Do Nothing
 			else
 				makeIlvl(frameDB[k], v)
@@ -314,8 +310,6 @@ function iLvLrOnModUpdate()
 		local iLevel = fetchIlvl(v, "player")
 		if iLevel then
 			if v == "ShirtSlot" or v == "TabardSlot" then
-				-- Do Nothing
-			elseif iLevel == "" then
 				-- Do Nothing
 			else
 				makeMod(frameDB[k], v)
@@ -383,7 +377,7 @@ function fetchIlvl(slotName, unit)
 		return effectiveILvl
 	end
 	
-	return ""
+	return nil
 end
 
 function fetchDura(slotName)
@@ -736,7 +730,7 @@ function makeMod(frame, slot)
 					isEnchanted = fetchChant(slot)
 				end
 				for k,v in pairs(profIDs) do
-					if v == 182 or v == 186 or v == 393 then
+					if v == 182 or v == 186 or v == 393 then --182 Herbalism, 186 Mining, 393 Skining
 						canEnchant = true
 						isEnchanted = fetchChant(slot)
 					end
