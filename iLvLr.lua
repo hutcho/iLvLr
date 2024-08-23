@@ -175,7 +175,6 @@ function iLvLrMain()
     iLvLrFrame:RegisterEvent("UPDATE_INVENTORY_DURABILITY")
     iLvLrFrame:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
     iLvLrFrame:RegisterEvent("SOCKET_INFO_UPDATE")
-    iLvLrFrame:RegisterEvent("ITEM_UPGRADE_MASTER_UPDATE")
     iLvLrFrame:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
     iLvLrFrame:SetScript("OnEvent", iLvLrOnEvent)
 end
@@ -238,7 +237,7 @@ function iLvLrOnEvent(self, event, what)
         iLvLrOnItemUpdate()
         iLvLrOnModUpdate()
         iLvLrFrame:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
-    elseif event == "SOCKET_INFO_UPDATE" or event == "ITEM_UPGRADE_MASTER_UPDATE" then
+    elseif event == "SOCKET_INFO_UPDATE" then
         --print("Gem Change/Upgrade Update")
         iLvLrOnItemUpdate()
         iLvLrOnModUpdate()
