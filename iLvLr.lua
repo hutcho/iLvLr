@@ -396,7 +396,7 @@ function fetchSocketCount(slotName)
     local itemLink = GetInventoryItemLink("player", GetInventorySlotInfo(slotName))
     local socketCount = 0
 
-    local stats = GetItemStats(itemLink)
+    local stats = C_Item.GetItemStats(itemLink)
 
     socketCount = (stats["EMPTY_SOCKET_RED"] or 0) +
                     (stats["EMPTY_SOCKET_YELLOW"] or 0) +
