@@ -1,4 +1,4 @@
-## Interface: 90100
+## Interface: 110005
 ## Title: |cff00ff00iLvLr|r
 ## X-Curse-Project-ID: 34990
 ## Author: |cffffcc00JerichoHM|r
