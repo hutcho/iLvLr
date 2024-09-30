@@ -1,11 +1,12 @@
 ## Interface: 110002
 ## Title: |cff00ff00iLvLr|r
-## Author: |cffffcc00JerichoHM|r
-## Version: |cffFF45001.2.0|r
-## Notes: A tool to help gearing your character by showing ilvl on the character pane
+## Author: hutcho
+## Version: 1.1.0
+## Notes: Show item ilevel, enchant and durability in the character pane
 ## Dependancies:
 ## SavedVariablesPerCharacter: iLvLrSettings, iDuraState, iColourState, iRelicState
 ## X-Curse-Project-ID: 1089812
 ## X-Website: https://github.com/hutcho/iLvLr
+
 utils.lua
 iLvLr.lua

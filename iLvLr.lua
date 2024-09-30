@@ -4,7 +4,7 @@
 
 local addonName, addonTable = ...
 local Title = "|cff00ff00" .. addonName .. "|r"
-local core_version, revision_version, build_version = 1, 2, 0
+local core_version, revision_version, build_version = 1, 1, 0
 local Core = "|cffFF4500" .. core_version .. "|r"
 local Revision = "|cffFF4500" .. revision_version .. "|r"
 local Build = "|cffFF4500" .. build_version .. "|r"
@@ -377,50 +377,50 @@ function fetchGem(slotName)
     return foundGems
 end
 
-function fetchBaseSocket(slotName)
-    local itemLink = GetInventoryItemLink("player", GetInventorySlotInfo(slotName))
+-- function fetchBaseSocket(slotName)
+--     local itemLink = GetInventoryItemLink("player", GetInventorySlotInfo(slotName))
 
-    local parsedItemDataTable = {}
-    local _, _, parsedItemData = string.find(itemLink, "^|c%x+|H(.+)|h%[.*%]")
+--     local parsedItemDataTable = {}
+--     local _, _, parsedItemData = string.find(itemLink, "^|c%x+|H(.+)|h%[.*%]")
 
-    for v in string.gmatch(parsedItemData, "[^:]+") do
-        tinsert(parsedItemDataTable, v)
-    end
+--     for v in string.gmatch(parsedItemData, "[^:]+") do
+--         tinsert(parsedItemDataTable, v)
+--     end
 
-    local baseItem = "|Hitem:" .. parsedItemDataTable[2] .. ":0"
-    local _, itemLink = C_Item.GetItemInfo(baseItem)
-    local baseSocketCount = 0
-    for i = 1, 4 do
-        if  _G["iLvLrScannerTexture" .. i]  then
-             _G["iLvLrScannerTexture" .. i]:SetTexture("")
-         end
-    end
+--     local baseItem = "|Hitem:" .. parsedItemDataTable[2] .. ":0"
+--     local _, itemLink = C_Item.GetItemInfo(baseItem)
+--     local baseSocketCount = 0
+--     for i = 1, 4 do
+--         if  _G["iLvLrScannerTexture" .. i]  then
+--              _G["iLvLrScannerTexture" .. i]:SetTexture("")
+--          end
+--     end
 
-    if not iLvLrScanner then CreateFrame("GameToolTip", "iLvLrScanner", UIParent, "GameTooltipTemplate") end
-    local ttScanner = iLvLrScanner
+--     if not iLvLrScanner then CreateFrame("GameToolTip", "iLvLrScanner", UIParent, "GameTooltipTemplate") end
+--     local ttScanner = iLvLrScanner
 
-    ttScanner:SetOwner(addonTable.iLvLrFrame, "ANCHOR_NONE")
-    ttScanner:ClearLines()
-    if itemLink == nil or itemLink == "" or itemLink == "0" then
-        print("Hyperlink has not loaded fully yet.")
-    else
-        ttScanner:SetHyperlink(itemLink)
-        if ttScanner == nil then
-            print("Hyperlink has not loaded fully yet.")
-        end
-    end
+--     ttScanner:SetOwner(addonTable.iLvLrFrame, "ANCHOR_NONE")
+--     ttScanner:ClearLines()
+--     if itemLink == nil or itemLink == "" or itemLink == "0" then
+--         print("Hyperlink has not loaded fully yet.")
+--     else
+--         ttScanner:SetHyperlink(itemLink)
+--         if ttScanner == nil then
+--             print("Hyperlink has not loaded fully yet.")
+--         end
+--     end
 
-    for i = 1, 4 do
-        local texture = _G["iLvLrScannerTexture" .. i]:GetTexture()
-        if texture then
-            baseSocketCount = baseSocketCount + 1
-        end
-    end
+--     for i = 1, 4 do
+--         local texture = _G["iLvLrScannerTexture" .. i]:GetTexture()
+--         if texture then
+--             baseSocketCount = baseSocketCount + 1
+--         end
+--     end
 
 
 
-    return baseSocketCount
-end
+--     return baseSocketCount
+-- end
 
 
 

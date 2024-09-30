@@ -3,9 +3,14 @@
 
 # iLvLr
 
-Shows the ilvl of each of your equipped items in the character pane, without you having to mouse over your gear.
-Credits
+Shows the ilevel of each of your equipped items in the character pane, without you
+having to mouse over your gear. Also shows enchant status and durability.
+
+# Install
+
+See https://www.curseforge.com/wow/addons/ilvlr2 or download the release here.
+
 
 ## Credits
 
-This is a fork of iLvLr https://www.curseforge.com/wow/addons/ilvlr made by lownignitus. All original work is by him. I have only done bug fixes for the new retail versions.
+This is a fork of iLvLr by JerichoHM and maintained by lownignitus.
