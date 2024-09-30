@@ -22,7 +22,6 @@ function utils:get_ilevel_from_item_link(itemLink)
     end
 end
 
-
 function utils:is_in_table(slot, table)
     for _, table_slot in ipairs(table) do
         if slot == table_slot then

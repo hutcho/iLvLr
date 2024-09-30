@@ -8,7 +8,7 @@ local core_version, revision_version, build_version = 1, 1, 0
 local Core = "|cffFF4500" .. core_version .. "|r"
 local Revision = "|cffFF4500" .. revision_version .. "|r"
 local Build = "|cffFF4500" .. build_version .. "|r"
-SLASH_ILVLR1 = '/ilvlr'
+SLASH_ILVLR1 = "/ilvlr"
 
 local utils = addonTable.utils
 
@@ -98,7 +98,7 @@ local dualWield = {
     260, -- Outlaw
     261, -- Subtlety
     263, -- Enhancement
-    72 -- Fury
+    72   -- Fury
 }
 
 local iLvlFrames = {}
@@ -138,7 +138,7 @@ function iLvLrVariableCheck()
     elseif iColourState == "enabled" or iColourState == "disabled" then
         if iColourState == "enabled" then
             iColourState = true
-        elseif  iColourState == "disabled" then
+        elseif iColourState == "disabled" then
             iColourState = false
         end
     end
@@ -148,13 +148,11 @@ function iLvLrVariableCheck()
     elseif iRelicState == "enabled" or iRelicState == "disabled" then
         if iRelicState == "enabled" then
             iRelicState = true
-        elseif  iRelicState == "disabled" then
+        elseif iRelicState == "disabled" then
             iRelicState = false
         end
     end
 end
-
-
 
 function SlashCmdList.ILVLR(msg)
     if msg == "durability" then
@@ -190,10 +188,10 @@ function iLvLrOnEvent(self, event, what)
     if event == "ADDON_LOADED" then
         iLvLrVariableCheck()
     elseif event == "ACTIVE_TALENT_GROUP_CHANGED" then
---		print("Talent Change.")
+        --		print("Talent Change.")
         mainSave = 0
         offSave = 0
---		print("Saves cleared.")
+        --		print("Saves cleared.")
     elseif event == "PLAYER_EQUIPMENT_CHANGED" then
         addonTable.iLvLrFrame:UnregisterEvent("PLAYER_EQUIPMENT_CHANGED")
         addonTable.iLvLrFrame:RegisterEvent("BAG_UPDATE_DELAYED")
@@ -223,7 +221,6 @@ function iLvLrOnEvent(self, event, what)
         iLvLrOnDuraUpdate()
     end
 end
-
 
 function iLvlrUpdateAll(frame, slot_name, ilvl)
     make_ilvl_frame(frame, slot_name, ilvl)
@@ -266,7 +263,7 @@ end
 
 function iLvLrOnDuraUpdate()
     --print("in OnDuraUpdate")
-    for k ,v in pairs(slotDB) do
+    for k, v in pairs(slotDB) do
         local iLevel = utils:get_ilevel_from_slot_name(v)
         if iLevel then
             makeDurability(frameDB[k], v)
@@ -279,7 +276,7 @@ function iLvLrOnDuraUpdate()
 end
 
 function iLvLrOnModUpdate()
-    for k ,v in pairs(slotDB) do
+    for k, v in pairs(slotDB) do
         local iLevel = utils:get_ilevel_from_slot_name(v)
         if iLevel then
             if v == "ShirtSlot" or v == "TabardSlot" then
@@ -297,7 +294,7 @@ end
 
 function GetItemLinkInfo(link)
     local itemColor, itemString, itemName
-    if ( link ) then
+    if (link) then
         itemColor, itemString, itemName = link:match("(|c%x+)|Hitem:([-%d:%a]+)|h%[(.-)%]|h|r");
     end
     return itemName, itemString, itemColor
@@ -305,12 +302,12 @@ end
 
 function SplitString(seperator, value)
     local list = {}
-    gsub(value..seperator, "([^"..seperator.."]*)"..seperator, function(v) table.insert(list, v) end);
+    gsub(value .. seperator, "([^" .. seperator .. "]*)" .. seperator, function(v) table.insert(list, v) end);
     return list
 end
 
 function SplitValue(value)
-    if ( value == "" ) then
+    if (value == "") then
         value = "0"
     end
     return tonumber(value)
@@ -318,17 +315,16 @@ end
 
 function fetchProfs()
     local prof1, prof2 = GetProfessions()
-    local profs = {prof1, prof2}
+    local profs = { prof1, prof2 }
     local profIDs = {}
 
     for k, v in pairs(profs) do
-        local _,_,_,_,_,_,skillID = GetProfessionInfo(v)
+        local _, _, _, _, _, _, skillID = GetProfessionInfo(v)
         tinsert(profIDs, skillID)
     end
 
     return profIDs
 end
-
 
 function fetchDura(slotName)
     local slotId, _ = GetInventorySlotInfo(slotName)
@@ -349,10 +345,10 @@ function fetchSocketCount(slotName)
 
         local socketCount = 0
         socketCount = (itemStats["EMPTY_SOCKET_RED"] or 0) +
-                        (itemStats["EMPTY_SOCKET_YELLOW"] or 0) +
-                        (itemStats["EMPTY_SOCKET_BLUE"] or 0) +
-                        (itemStats["EMPTY_SOCKET_META"] or 0) +
-                        (itemStats["EMPTY_SOCKET_PRISMATIC"] or 0)
+            (itemStats["EMPTY_SOCKET_YELLOW"] or 0) +
+            (itemStats["EMPTY_SOCKET_BLUE"] or 0) +
+            (itemStats["EMPTY_SOCKET_META"] or 0) +
+            (itemStats["EMPTY_SOCKET_PRISMATIC"] or 0)
 
         return socketCount
     end
@@ -436,9 +432,9 @@ function make_ilvl_frame(frame, slot_name, ilvl)
             ilvl_frame:SetPoint("CENTER", frame, "CENTER", 0, 41)
         end
 
-        ilvl_frame:SetSize(10,10)
-        ilvl_frame:SetBackdrop({bgFile = nil, edgeFile = nil, tile = false, tileSize = 32, edgeSize = 0, insets = {left = 0, right = 0, top = 0, bottom = 0}})
-        ilvl_frame:SetBackdropColor(0,0,0,0)
+        ilvl_frame:SetSize(10, 10)
+        ilvl_frame:SetBackdrop({ bgFile = nil, edgeFile = nil, tile = false, tileSize = 32, edgeSize = 0, insets = { left = 0, right = 0, top = 0, bottom = 0 } })
+        ilvl_frame:SetBackdropColor(0, 0, 0, 0)
 
         local iLvlText = ilvl_frame:CreateFontString(nil, "ARTWORK")
         iLvlText:SetFont("Fonts\\FRIZQT__.TTF", 13, "OUTLINE")
@@ -464,7 +460,6 @@ function make_ilvl_frame(frame, slot_name, ilvl)
 
     ilvl_frame:Show()
     iLvlFrames[slot_name] = ilvl_frame
-
 end
 
 function makeDurability(frame, slot)
@@ -474,16 +469,16 @@ function makeDurability(frame, slot)
         iDura = CreateFrame("Frame", nil, frame, "BackdropTemplate")
 
         if frame == CharacterHeadSlot or frame == CharacterNeckSlot or frame == CharacterShoulderSlot or frame == CharacterBackSlot or frame == CharacterChestSlot or frame == CharacterWristSlot or frame == CharacterShirtSlot or frame == CharacterTabardSlot then
-                iDura:SetPoint("BOTTOM", frame, "BOTTOM", 38, 0)
-            elseif frame == CharacterHandsSlot or frame == CharacterWaistSlot or frame == CharacterLegsSlot or frame == CharacterFeetSlot or frame == CharacterFinger0Slot or frame == CharacterFinger1Slot or frame == CharacterTrinket0Slot or frame == CharacterTrinket1Slot then
-                iDura:SetPoint("BOTTOM", frame, "BOTTOM", -38, 0)
-            elseif frame == CharacterMainHandSlot or frame == CharacterSecondaryHandSlot then
-                iDura:SetPoint("BOTTOM", frame, "BOTTOM", 0, 42)
-            end
+            iDura:SetPoint("BOTTOM", frame, "BOTTOM", 38, 0)
+        elseif frame == CharacterHandsSlot or frame == CharacterWaistSlot or frame == CharacterLegsSlot or frame == CharacterFeetSlot or frame == CharacterFinger0Slot or frame == CharacterFinger1Slot or frame == CharacterTrinket0Slot or frame == CharacterTrinket1Slot then
+            iDura:SetPoint("BOTTOM", frame, "BOTTOM", -38, 0)
+        elseif frame == CharacterMainHandSlot or frame == CharacterSecondaryHandSlot then
+            iDura:SetPoint("BOTTOM", frame, "BOTTOM", 0, 42)
+        end
 
-        iDura:SetSize(10,10)
-        iDura:SetBackdrop({bgFile = nil, edgeFile = nil, tile = false, tileSize = 32, edgeSize = 0, insets = {left = 0, right = 0, top = 0, bottom = 0}})
-        iDura:SetBackdropColor(0,0,0,0)
+        iDura:SetSize(10, 10)
+        iDura:SetBackdrop({ bgFile = nil, edgeFile = nil, tile = false, tileSize = 32, edgeSize = 0, insets = { left = 0, right = 0, top = 0, bottom = 0 } })
+        iDura:SetBackdropColor(0, 0, 0, 0)
 
         local iDuraText = iDura:CreateFontString(nil, "ARTWORK")
         iDuraText:SetFont("Fonts\\FRIZQT__.TTF", 13, "OUTLINE")
@@ -501,7 +496,7 @@ function makeDurability(frame, slot)
             local itemDurabilityPercentage = (itemDurability / itemMaxDurability) * 100
             if itemDurabilityPercentage > 25 then
                 iDura.text:SetFormattedText("|cff00ff00%i%%|r", itemDurabilityPercentage)
-                elseif itemDurabilityPercentage > 0 and itemDurabilityPercentage <= 25 then
+            elseif itemDurabilityPercentage > 0 and itemDurabilityPercentage <= 25 then
                 iDura.text:SetFormattedText("|cff00ffff%i%%|r", itemDurabilityPercentage)
             elseif itemDurabilityPercentage == 0 then
                 iDura.text:SetFormattedText("|cffff0000%i%%|r", itemDurabilityPercentage)
@@ -524,16 +519,16 @@ function makeMod(frame, slot_name)
         iMod = CreateFrame("Frame", nil, frame, "BackdropTemplate")
 
         if frame == CharacterHeadSlot or frame == CharacterNeckSlot or frame == CharacterShoulderSlot or frame == CharacterBackSlot or frame == CharacterChestSlot or frame == CharacterWristSlot or frame == CharacterShirtSlot or frame == CharacterTabardSlot then
-                iMod:SetPoint("TOP", frame, "TOP", 38, -3)
-            elseif frame == CharacterHandsSlot or frame == CharacterWaistSlot or frame == CharacterLegsSlot or frame == CharacterFeetSlot or frame == CharacterFinger0Slot or frame == CharacterFinger1Slot or frame == CharacterTrinket0Slot or frame == CharacterTrinket1Slot then
-                iMod:SetPoint("TOP", frame, "TOP", -38, -3)
-            elseif frame == CharacterMainHandSlot or frame == CharacterSecondaryHandSlot then
-                iMod:SetPoint("TOP", frame, "TOP", 0, 39)
-            end
+            iMod:SetPoint("TOP", frame, "TOP", 38, -3)
+        elseif frame == CharacterHandsSlot or frame == CharacterWaistSlot or frame == CharacterLegsSlot or frame == CharacterFeetSlot or frame == CharacterFinger0Slot or frame == CharacterFinger1Slot or frame == CharacterTrinket0Slot or frame == CharacterTrinket1Slot then
+            iMod:SetPoint("TOP", frame, "TOP", -38, -3)
+        elseif frame == CharacterMainHandSlot or frame == CharacterSecondaryHandSlot then
+            iMod:SetPoint("TOP", frame, "TOP", 0, 39)
+        end
 
-        iMod:SetSize(10,10)
-        iMod:SetBackdrop({bgFile = nil, edgeFile = nil, tile = false, tileSize = 32, edgeSize = 0, insets = {left = 0, right = 0, top = 0, bottom = 0}})
-        iMod:SetBackdropColor(0,0,0,0)
+        iMod:SetSize(10, 10)
+        iMod:SetBackdrop({ bgFile = nil, edgeFile = nil, tile = false, tileSize = 32, edgeSize = 0, insets = { left = 0, right = 0, top = 0, bottom = 0 } })
+        iMod:SetBackdropColor(0, 0, 0, 0)
 
         local iModText = iMod:CreateFontString(nil, "ARTWORK")
         iModText:SetFont("Fonts\\FRIZQT__.TTF", 11, "OUTLINE")
@@ -684,17 +679,17 @@ function makeMod(frame, slot_name)
     end
 
     if numSockets > 0 and item_is_enchantable then
-        if not enchant_id and foundGems < numSockets then -- Missing (Red) Enchant and Gem
+        if not enchant_id and foundGems < numSockets then      -- Missing (Red) Enchant and Gem
             iMod.text:SetFormattedText("|cffff0000%s|r|cffff0000%s|r", "E", "G")
         elseif not enchant_id and foundGems == numSockets then -- Missing (Red) Enchant, Found (Green) Gem
             iMod.text:SetFormattedText("|cffff0000%s|r|cff00ff00%s|r", "E", "G")
-        elseif enchant_id and foundGems < numSockets then -- Found (Green) Enchant, Missing(Red) Gem
+        elseif enchant_id and foundGems < numSockets then      -- Found (Green) Enchant, Missing(Red) Gem
             iMod.text:SetFormattedText("|cff00ff00%s|r|cffff0000%s|r", "E", "G")
-        elseif enchant_id and foundGems == numSockets then -- Found (Green) Enchant and Gem
+        elseif enchant_id and foundGems == numSockets then     -- Found (Green) Enchant and Gem
             iMod.text:SetFormattedText("|cff00ff00%s|r|cff00ff00%s|r", "E", "G")
         end
     elseif numSockets > 0 and not item_is_enchantable then
-        if foundGems < numSockets then -- Missing (Red) Gem
+        if foundGems < numSockets then      -- Missing (Red) Gem
             iMod.text:SetFormattedText("|cffff0000%s|r", "G")
         elseif foundGems == numSockets then -- Found (Green) Gem
             iMod.text:SetFormattedText("|cff00ff00%s|r", "G")
@@ -702,7 +697,7 @@ function makeMod(frame, slot_name)
     elseif numSockets == 0 and item_is_enchantable then
         if enchant_id then -- Item is enchanted
             iMod.text:SetFormattedText("|cff00ff00%s|r", "E")
-        else -- Item not chanted
+        else               -- Item not chanted
             iMod.text:SetFormattedText("|cffff0000%s|r", "E")
         end
     elseif numSockets == 0 and not item_is_enchantable then
@@ -715,7 +710,7 @@ function makeMod(frame, slot_name)
 end
 
 function iDuraToggle(state)
---[[	if iDuraState == false then
+    --[[	if iDuraState == false then
         print("iDuraState = false.")
     elseif iDuraState == true then
         print("iDuraState = true.")
