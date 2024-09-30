@@ -1,14 +1,11 @@
-## Interface: 110005
+## Interface: 110002
 ## Title: |cff00ff00iLvLr|r
-## X-Curse-Project-ID: 34990
 ## Author: |cffffcc00JerichoHM|r
-## X-Maintainer: |cffDA70D6LownIgnitus|r Mihkael@US-Alexstrasza
-## Version: |cffFF45002.4.4|r
-## X-Date: 2021/06/30
-## X-Website: https://github.com/lownignitus/iLvLr
-## X-Contact: https://twitter.com/lownignitus
-## Notes: Tool to help gearing a character
+## Version: |cffFF45001.2.0|r
+## Notes: A tool to help gearing your character by showing ilvl on the character pane
 ## Dependancies:
 ## SavedVariablesPerCharacter: iLvLrSettings, iDuraState, iColourState, iRelicState
-
+## X-Curse-Project-ID: 1089812
+## X-Website: https://github.com/hutcho/iLvLr
+utils.lua
 iLvLr.lua
