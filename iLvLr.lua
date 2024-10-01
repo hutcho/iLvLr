@@ -5,12 +5,17 @@
 local addonName, addonTable = ...
 local Title = "|cff00ff00" .. addonName .. "|r"
 local core_version, revision_version, build_version = 1, 1, 0
-local Core = "|cffFF4500" .. core_version .. "|r"
-local Revision = "|cffFF4500" .. revision_version .. "|r"
-local Build = "|cffFF4500" .. build_version .. "|r"
+local Core = "|cff00ff00" .. core_version .. "|r"
+local Revision = "|cff00ff00" .. revision_version .. "|r"
+local Build = "|cff00ff00" .. build_version .. "|r"
 SLASH_ILVLR1 = "/ilvlr"
 
 local utils = addonTable.utils
+
+addonTable.ilvlr = {}
+
+---@class ilvlr
+local ilvlr = addonTable.ilvlr
 
 local frameDB = {
     CharacterHeadSlot,
@@ -105,33 +110,24 @@ local iLvlFrames = {}
 local iDuraFrames = {}
 local iModFrames = {}
 
-addonTable.f = CreateFrame("Frame", "iLvLrmain", CharacterFrame, "BackdropTemplate")
-addonTable.f:SetScript("OnShow", function(self) iLvLrOnLoad() end)
+-- ilvlr.f = CreateFrame("Frame", "iLvLrmain", CharacterFrame, "BackdropTemplate")
+-- ilvlr.f:SetScript("OnShow", function(self) iLvLrOnLoad() end)
 
-function iLvLrMain()
-    addonTable.iLvLrFrame = CreateFrame("Frame", "iLvLrFrame", UIParent)
-    addonTable.iLvLrFrame:RegisterEvent("ADDON_LOADED")
-    addonTable.iLvLrFrame:RegisterEvent("UPDATE_INVENTORY_DURABILITY")
-    addonTable.iLvLrFrame:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
-    addonTable.iLvLrFrame:RegisterEvent("SOCKET_INFO_UPDATE")
-    addonTable.iLvLrFrame:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
-    addonTable.iLvLrFrame:SetScript("OnEvent", iLvLrOnEvent)
+function ilvlr:main()
+    ilvlr.iLvLrFrame = CreateFrame("Frame", "iLvLrFrame", UIParent)
+    ilvlr.iLvLrFrame:RegisterEvent("ADDON_LOADED")
+    ilvlr.iLvLrFrame:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
+    ilvlr.iLvLrFrame:RegisterEvent("SOCKET_INFO_UPDATE")
+    ilvlr.iLvLrFrame:RegisterEvent("UPDATE_INVENTORY_DURABILITY")
+    ilvlr.iLvLrFrame:SetScript("OnEvent", iLvLrOnEvent)
 end
 
-function iLvLrVariableCheck()
+function ilvlr:variable_check()
     if iDuraState == nil then
+        -- Show durability by default
         iDuraState = true
-    elseif iDuraState == "enabled" or iDuraState == "disabled" then
-        if iDuraState == "enabled" then
-            iDuraState = true
-        elseif iDuraState == "disabled" then
-            iDuraState = false
-        end
     end
-
-    if iDuraState == false then
-        iDuraToggle(iDuraState)
-    end
+    print("iDuraState" .. tostring(iDuraState))
 
     if iColourState == nil then
         iColourState = true
@@ -156,15 +152,9 @@ end
 
 function SlashCmdList.ILVLR(msg)
     if msg == "durability" then
-        if iDuraState == true then
-            iDuraState = false
-            iDuraToggle(iDuraState)
-            print("Durability turned |cffff0000off|r!")
-        elseif iDuraState == false then
-            iDuraState = true
-            iDuraToggle(iDuraState)
-            print("Durability turned |cff00ff00on|r!")
-        end
+        ilvlr:toggle_durability()
+        iDuraState = not iDuraState
+        print("Durability turned " .. (iDuraState and "|cff00ff00on|r!" or "|cffff0000off|r!"))
     elseif msg == "colour" then
         if iColourState == true then
             iColourState = false
@@ -174,50 +164,21 @@ function SlashCmdList.ILVLR(msg)
             print("ilvl colour turned |cff00ff00on|r!")
         end
     else
-        print("Thank you for using " .. Title)
-        print("Version: " .. Core .. "." .. Revision .. "." .. Build)
-        print("Author: |cffffcc00JerichoHM|r / Maintainer: |cffDA70D6LownIgnitus|r")
-        print("Slash Commands are listed below and start with /iLvLr")
-        print("      durability - Disables or Enables the durability tracker")
-        print("      colour - Disables colouring ilvl by +/- avg")
+        print(Title .. " v" .. Core .. "." .. Revision .. "." .. Build)
+        print("Available commands:")
+        print("|cff00cc66/ilvlr durability|r - Toggle durability display")
+        print("|cff00cc66/ilvlr colour|r - Toggle colouring of item level number")
     end
 end
 
 --Thanks to John454ss for code help
-function iLvLrOnEvent(self, event, what)
+function iLvLrOnEvent(self, event)
     if event == "ADDON_LOADED" then
-        iLvLrVariableCheck()
-    elseif event == "ACTIVE_TALENT_GROUP_CHANGED" then
-        --		print("Talent Change.")
-        mainSave = 0
-        offSave = 0
-        --		print("Saves cleared.")
-    elseif event == "PLAYER_EQUIPMENT_CHANGED" then
-        addonTable.iLvLrFrame:UnregisterEvent("PLAYER_EQUIPMENT_CHANGED")
-        addonTable.iLvLrFrame:RegisterEvent("BAG_UPDATE_DELAYED")
-    elseif event == "BAG_UPDATE_DELAYED" then
-        addonTable.iLvLrFrame:UnregisterEvent("BAG_UPDATE_DELAYED")
-        if not InCombatLockdown() then
-            --print("Equipment Update")
-            iLvLrOnItemUpdate()
-            iLvLrOnDuraUpdate()
-            iLvLrOnModUpdate()
-            addonTable.iLvLrFrame:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
-        else
-            addonTable.iLvLrFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
-        end
-    elseif event == "PLAYER_REGEN_ENABLED" then
-        --print("Equipment Update")
-        addonTable.iLvLrFrame:UnregisterEvent("PLAYER_REGEN_ENABLED")
+        ilvlr:variable_check()
         iLvLrOnItemUpdate()
-        iLvLrOnModUpdate()
-        addonTable.iLvLrFrame:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
-    elseif event == "SOCKET_INFO_UPDATE" then
-        --print("Gem Change/Upgrade Update")
+    elseif event == "PLAYER_EQUIPMENT_CHANGED" or event == "SOCKET_INFO_UPDATE" then
         iLvLrOnItemUpdate()
-        iLvLrOnModUpdate()
     elseif event == "UPDATE_INVENTORY_DURABILITY" then
-        --print("Durability Update")
         iLvLrOnDuraUpdate()
     end
 end
@@ -228,17 +189,17 @@ function iLvlrUpdateAll(frame, slot_name, ilvl)
     makeMod(frame, slot_name)
 end
 
-function iLvLrOnLoad()
-    -- Loop over all item slots by name
-    for i, slot_name in pairs(slotDB) do
-        if slot_name ~= "ShirtSlot" and slot_name ~= "TabardSlot" then
-            local ilvl = utils:get_ilevel_from_slot_name(slot_name)
-            if ilvl then
-                iLvlrUpdateAll(frameDB[i], slot_name, ilvl)
-            end
-        end
-    end
-end
+-- function iLvLrOnLoad()
+--     -- Loop over all item slots by name
+--     for i, slot_name in pairs(slotDB) do
+--         if slot_name ~= "ShirtSlot" and slot_name ~= "TabardSlot" then
+--             local ilvl = utils:get_ilevel_from_slot_name(slot_name)
+--             if ilvl then
+--                 iLvlrUpdateAll(frameDB[i], slot_name, ilvl)
+--             end
+--         end
+--     end
+-- end
 
 function iLvLrOnItemUpdate()
     for i, slot_name in pairs(slotDB) do
@@ -263,30 +224,30 @@ end
 
 function iLvLrOnDuraUpdate()
     --print("in OnDuraUpdate")
-    for k, v in pairs(slotDB) do
-        local iLevel = utils:get_ilevel_from_slot_name(v)
+    for i, slot_name in pairs(slotDB) do
+        local iLevel = utils:get_ilevel_from_slot_name(slot_name)
         if iLevel then
-            makeDurability(frameDB[k], v)
+            makeDurability(frameDB[i], slot_name)
         else
-            if iDuraFrames[v] then
-                iDuraFrames[v]:Hide()
+            if iDuraFrames[slot_name] then
+                iDuraFrames[slot_name]:Hide()
             end
         end
     end
 end
 
 function iLvLrOnModUpdate()
-    for k, v in pairs(slotDB) do
-        local iLevel = utils:get_ilevel_from_slot_name(v)
+    for i, slot_name in pairs(slotDB) do
+        local iLevel = utils:get_ilevel_from_slot_name(slot_name)
         if iLevel then
-            if v == "ShirtSlot" or v == "TabardSlot" then
+            if slot_name == "ShirtSlot" or slot_name == "TabardSlot" then
                 -- Do Nothing
             else
-                makeMod(frameDB[k], v)
+                makeMod(frameDB[i], slot_name)
             end
         else
-            if iModFrames[v] then
-                iModFrames[v]:Hide()
+            if iModFrames[slot_name] then
+                iModFrames[slot_name]:Hide()
             end
         end
     end
@@ -318,7 +279,7 @@ function fetchProfs()
     local profs = { prof1, prof2 }
     local profIDs = {}
 
-    for k, v in pairs(profs) do
+    for _, v in pairs(profs) do
         local _, _, _, _, _, _, skillID = GetProfessionInfo(v)
         tinsert(profIDs, skillID)
     end
@@ -467,10 +428,9 @@ function makeDurability(frame, slot)
     local iDura = iDuraFrames[slot]
     if not iDura then
         iDura = CreateFrame("Frame", nil, frame, "BackdropTemplate")
-
-        if frame == CharacterHeadSlot or frame == CharacterNeckSlot or frame == CharacterShoulderSlot or frame == CharacterBackSlot or frame == CharacterChestSlot or frame == CharacterWristSlot or frame == CharacterShirtSlot or frame == CharacterTabardSlot then
+        if utils:is_in_table(frame, left_side_character_pane) then
             iDura:SetPoint("BOTTOM", frame, "BOTTOM", 38, 0)
-        elseif frame == CharacterHandsSlot or frame == CharacterWaistSlot or frame == CharacterLegsSlot or frame == CharacterFeetSlot or frame == CharacterFinger0Slot or frame == CharacterFinger1Slot or frame == CharacterTrinket0Slot or frame == CharacterTrinket1Slot then
+        elseif utils:is_in_table(frame, right_side_character_pane) then
             iDura:SetPoint("BOTTOM", frame, "BOTTOM", -38, 0)
         elseif frame == CharacterMainHandSlot or frame == CharacterSecondaryHandSlot then
             iDura:SetPoint("BOTTOM", frame, "BOTTOM", 0, 42)
@@ -507,9 +467,10 @@ function makeDurability(frame, slot)
         iDuraFrames[slot] = iDura
     end
 
-    if iDuraState == true then
+    if iDuraState then
         iDura:Show()
     end
+
 end
 
 function makeMod(frame, slot_name)
@@ -518,9 +479,9 @@ function makeMod(frame, slot_name)
     if not iMod then
         iMod = CreateFrame("Frame", nil, frame, "BackdropTemplate")
 
-        if frame == CharacterHeadSlot or frame == CharacterNeckSlot or frame == CharacterShoulderSlot or frame == CharacterBackSlot or frame == CharacterChestSlot or frame == CharacterWristSlot or frame == CharacterShirtSlot or frame == CharacterTabardSlot then
+        if utils:is_in_table(frame, left_side_character_pane) then
             iMod:SetPoint("TOP", frame, "TOP", 38, -3)
-        elseif frame == CharacterHandsSlot or frame == CharacterWaistSlot or frame == CharacterLegsSlot or frame == CharacterFeetSlot or frame == CharacterFinger0Slot or frame == CharacterFinger1Slot or frame == CharacterTrinket0Slot or frame == CharacterTrinket1Slot then
+        elseif utils:is_in_table(frame, right_side_character_pane) then
             iMod:SetPoint("TOP", frame, "TOP", -38, -3)
         elseif frame == CharacterMainHandSlot or frame == CharacterSecondaryHandSlot then
             iMod:SetPoint("TOP", frame, "TOP", 0, 39)
@@ -709,19 +670,14 @@ function makeMod(frame, slot_name)
     iMod:Show()
 end
 
-function iDuraToggle(state)
-    --[[	if iDuraState == false then
-        print("iDuraState = false.")
-    elseif iDuraState == true then
-        print("iDuraState = true.")
-    end]]
-    for k, v in pairs(iDuraFrames) do
-        if state == true then
-            v:Show()
-        elseif state == false then
-            v:Hide()
+function ilvlr:toggle_durability()
+    for _, frame in pairs(iDuraFrames) do
+        if iDuraState == true then
+            frame:Show()
+        else
+            frame:Hide()
         end
     end
 end
 
-iLvLrMain()
+ilvlr:main()
