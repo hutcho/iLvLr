@@ -122,21 +122,15 @@ function ilvlr:main()
     ilvlr.iLvLrFrame:SetScript("OnEvent", iLvLrOnEvent)
 end
 
-function ilvlr:variable_check()
+function ilvlr:init_variables()
     if iDuraState == nil then
         -- Show durability by default
         iDuraState = true
     end
-    print("iDuraState" .. tostring(iDuraState))
 
     if iColourState == nil then
+        -- show colour by default
         iColourState = true
-    elseif iColourState == "enabled" or iColourState == "disabled" then
-        if iColourState == "enabled" then
-            iColourState = true
-        elseif iColourState == "disabled" then
-            iColourState = false
-        end
     end
 
     if iRelicState == nil then
@@ -151,18 +145,14 @@ function ilvlr:variable_check()
 end
 
 function SlashCmdList.ILVLR(msg)
-    if msg == "durability" then
-        ilvlr:toggle_durability()
+    if msg == "durability" or msg == "dura" or msg == "d" then
         iDuraState = not iDuraState
-        print("Durability turned " .. (iDuraState and "|cff00ff00on|r!" or "|cffff0000off|r!"))
-    elseif msg == "colour" then
-        if iColourState == true then
-            iColourState = false
-            print("ilvl colour turned |cffff0000off|r!")
-        elseif iColourState == false then
-            iColourState = true
-            print("ilvl colour turned |cff00ff00on|r!")
-        end
+        ilvlr:apply_durability_visibility()
+        print("iLvLr: Durability turned " .. (iDuraState and "|cff00ff00on|r!" or "|cffff0000off|r!"))
+    elseif msg == "colour" or msg == "color" or msg == "c" then
+        iColourState = not iColourState
+        iLvLrOnItemUpdate()
+        print("iLvLr: Colour turned "  .. (iColourState and "|cff00ff00on|r!" or "|cffff0000off|r!"))
     else
         print(Title .. " v" .. Core .. "." .. Revision .. "." .. Build)
         print("Available commands:")
@@ -174,7 +164,8 @@ end
 --Thanks to John454ss for code help
 function iLvLrOnEvent(self, event)
     if event == "ADDON_LOADED" then
-        ilvlr:variable_check()
+        ilvlr:init_variables()
+        ilvlr:apply_durability_visibility()
         iLvLrOnItemUpdate()
     elseif event == "PLAYER_EQUIPMENT_CHANGED" or event == "SOCKET_INFO_UPDATE" then
         iLvLrOnItemUpdate()
@@ -183,7 +174,7 @@ function iLvLrOnEvent(self, event)
     end
 end
 
-function iLvlrUpdateAll(frame, slot_name, ilvl)
+function ilvlr:iLvlrUpdateAll(frame, slot_name, ilvl)
     make_ilvl_frame(frame, slot_name, ilvl)
     makeDurability(frame, slot_name)
     makeMod(frame, slot_name)
@@ -206,7 +197,7 @@ function iLvLrOnItemUpdate()
         local ilvl = utils:get_ilevel_from_slot_name(slot_name)
         if ilvl then
             if slot_name ~= "ShirtSlot" and slot_name ~= "TabardSlot" then
-                iLvlrUpdateAll(frameDB[i], slot_name, ilvl)
+                ilvlr:iLvlrUpdateAll(frameDB[i], slot_name, ilvl)
             end
         else
             if iLvlFrames[slot_name] then
@@ -223,7 +214,6 @@ function iLvLrOnItemUpdate()
 end
 
 function iLvLrOnDuraUpdate()
-    --print("in OnDuraUpdate")
     for i, slot_name in pairs(slotDB) do
         local iLevel = utils:get_ilevel_from_slot_name(slot_name)
         if iLevel then
@@ -670,9 +660,9 @@ function makeMod(frame, slot_name)
     iMod:Show()
 end
 
-function ilvlr:toggle_durability()
+function ilvlr:apply_durability_visibility()
     for _, frame in pairs(iDuraFrames) do
-        if iDuraState == true then
+        if iDuraState then
             frame:Show()
         else
             frame:Hide()
