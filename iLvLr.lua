@@ -150,7 +150,7 @@ function SlashCmdList.ILVLR(msg)
     elseif msg == "colour" or msg == "color" or msg == "c" then
         iColourState = not iColourState
         iLvLrOnItemUpdate()
-        print("iLvLr: Colour turned "  .. (iColourState and "|cff00ff00on|r!" or "|cffff0000off|r!"))
+        print("iLvLr: Colour turned " .. (iColourState and "|cff00ff00on|r!" or "|cffff0000off|r!"))
     else
         print(Title .. " v" .. Core .. "." .. Revision .. "." .. Build)
         print("Available commands:")
