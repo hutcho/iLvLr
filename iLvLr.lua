@@ -4,7 +4,7 @@
 
 local addonName, addonTable = ...
 local Title = "|cff00ff00" .. addonName .. "|r"
-local core_version, revision_version, build_version = 1, 1, 0
+local core_version, revision_version, build_version = 1, 2, 0
 local Core = "|cff00ff00" .. core_version .. "|r"
 local Revision = "|cff00ff00" .. revision_version .. "|r"
 local Build = "|cff00ff00" .. build_version .. "|r"
@@ -251,18 +251,6 @@ function GetItemLinkInfo(link)
     return itemName, itemString, itemColor
 end
 
-function SplitString(seperator, value)
-    local list = {}
-    gsub(value .. seperator, "([^" .. seperator .. "]*)" .. seperator, function(v) table.insert(list, v) end);
-    return list
-end
-
-function SplitValue(value)
-    if (value == "") then
-        value = "0"
-    end
-    return tonumber(value)
-end
 
 function fetchProfs()
     local prof1, prof2 = GetProfessions()
@@ -289,87 +277,34 @@ function fetchDura(slotName)
     end
 end
 
-function fetchSocketCount(slotName)
+---@return number? socketCount The number of sockets on an item (includes socketed and unsocketed slots)
+function ilvlr:get_number_of_sockets(slotName)
     local itemLink = GetInventoryItemLink("player", GetInventorySlotInfo(slotName))
     if itemLink then
         local itemStats = C_Item.GetItemStats(itemLink)
-
-        local socketCount = 0
-        socketCount = (itemStats["EMPTY_SOCKET_RED"] or 0) +
-            (itemStats["EMPTY_SOCKET_YELLOW"] or 0) +
-            (itemStats["EMPTY_SOCKET_BLUE"] or 0) +
-            (itemStats["EMPTY_SOCKET_META"] or 0) +
+        socketCount = (itemStats["EMPTY_SOCKET_RED"]       or 0) +
+            (itemStats["EMPTY_SOCKET_YELLOW"]    or 0) +
+            (itemStats["EMPTY_SOCKET_BLUE"]      or 0) +
+            (itemStats["EMPTY_SOCKET_META"]      or 0) +
             (itemStats["EMPTY_SOCKET_PRISMATIC"] or 0)
-
         return socketCount
     end
 end
 
-function fetchGem(slotName)
+function ilvlr_get_socketed_gem_count(slotName)
     local itemLink = GetInventoryItemLink("player", GetInventorySlotInfo(slotName))
-    local foundGems = 0
-
     local _, itemString, _ = GetItemLinkInfo(itemLink)
-    local ids = SplitString(":", itemString)
-    local gem1 = SplitValue(ids[3])
-    local gem2 = SplitValue(ids[4])
-    local gem3 = SplitValue(ids[5])
-    local gem4 = SplitValue(ids[6])
+    local ids = utils:SplitString(itemString)
 
-    if gem1 > 0 then foundGems = foundGems + 1 end
-    if gem2 > 0 then foundGems = foundGems + 1 end
-    if gem3 > 0 then foundGems = foundGems + 1 end
-    if gem4 > 0 then foundGems = foundGems + 1 end
+    local gem_count = 0
+    -- loop over gem slots
+    for i = 1, 4 do
+        local has_gem = tonumber(ids[i+2])
+        if has_gem then gem_count = gem_count + 1 end
+    end
 
-    return foundGems
+    return gem_count
 end
-
--- function fetchBaseSocket(slotName)
---     local itemLink = GetInventoryItemLink("player", GetInventorySlotInfo(slotName))
-
---     local parsedItemDataTable = {}
---     local _, _, parsedItemData = string.find(itemLink, "^|c%x+|H(.+)|h%[.*%]")
-
---     for v in string.gmatch(parsedItemData, "[^:]+") do
---         tinsert(parsedItemDataTable, v)
---     end
-
---     local baseItem = "|Hitem:" .. parsedItemDataTable[2] .. ":0"
---     local _, itemLink = C_Item.GetItemInfo(baseItem)
---     local baseSocketCount = 0
---     for i = 1, 4 do
---         if  _G["iLvLrScannerTexture" .. i]  then
---              _G["iLvLrScannerTexture" .. i]:SetTexture("")
---          end
---     end
-
---     if not iLvLrScanner then CreateFrame("GameToolTip", "iLvLrScanner", UIParent, "GameTooltipTemplate") end
---     local ttScanner = iLvLrScanner
-
---     ttScanner:SetOwner(addonTable.iLvLrFrame, "ANCHOR_NONE")
---     ttScanner:ClearLines()
---     if itemLink == nil or itemLink == "" or itemLink == "0" then
---         print("Hyperlink has not loaded fully yet.")
---     else
---         ttScanner:SetHyperlink(itemLink)
---         if ttScanner == nil then
---             print("Hyperlink has not loaded fully yet.")
---         end
---     end
-
---     for i = 1, 4 do
---         local texture = _G["iLvLrScannerTexture" .. i]:GetTexture()
---         if texture then
---             baseSocketCount = baseSocketCount + 1
---         end
---     end
-
-
-
---     return baseSocketCount
--- end
-
-
 
 function make_ilvl_frame(frame, slot_name, ilvl)
     local ilvl_frame = iLvlFrames[slot_name]
@@ -398,7 +333,7 @@ function make_ilvl_frame(frame, slot_name, ilvl)
         if ilvl <= avgItemLevelBags - 5 then
             -- red
             ilvl_frame.text:SetFormattedText("|cffff0000%i|r", ilvl)
-        elseif ilvl >= avgItemLevelEquipped + 10 then
+        elseif ilvl >= avgItemLevelBags + 5  then
             -- green
             ilvl_frame.text:SetFormattedText("|cff00ff00%i|r", ilvl)
         else
@@ -486,10 +421,13 @@ function makeMod(frame, slot_name)
         iMod.text = iModText
     end
 
-    local foundGems = fetchGem(slot_name)
-    local numSockets = fetchSocketCount(slot_name)
-    local item_is_enchantable = false
+    local socket_count = ilvlr:get_number_of_sockets(slot_name)
+    local gem_count = 0
+    if socket_count > 0 then
+        gem_count = ilvlr_get_socketed_gem_count(slot_name)
+    end
 
+    local item_is_enchantable
     local enchant_id
 
     if slot_ilvl >= 350 then
@@ -501,29 +439,34 @@ function makeMod(frame, slot_name)
         end
     end
 
-    if numSockets > 0 and item_is_enchantable then
-        if not enchant_id and foundGems < numSockets then      -- Missing (Red) Enchant and Gem
+    local is_missing_gems = false
+    if socket_count > gem_count then
+        is_missing_gems = true
+    end
+
+    if socket_count > 0 and item_is_enchantable then
+        if not enchant_id and is_missing_gems then      -- Missing (Red E) Enchant and Missing (Red G) Gem
             iMod.text:SetFormattedText("|cffff0000%s|r|cffff0000%s|r", "E", "G")
-        elseif not enchant_id and foundGems == numSockets then -- Missing (Red) Enchant, Found (Green) Gem
+        elseif not enchant_id and not is_missing_gems then -- Missing (Red E) Enchant, Found (Green G) Gem
             iMod.text:SetFormattedText("|cffff0000%s|r|cff00ff00%s|r", "E", "G")
-        elseif enchant_id and foundGems < numSockets then      -- Found (Green) Enchant, Missing(Red) Gem
+        elseif enchant_id and is_missing_gems then      -- Found (Green E) Enchant, Missing (Red G) Gem
             iMod.text:SetFormattedText("|cff00ff00%s|r|cffff0000%s|r", "E", "G")
-        elseif enchant_id and foundGems == numSockets then     -- Found (Green) Enchant and Gem
+        elseif enchant_id and not is_missing_gems then     -- Found (Green E) Enchant and Found (Green G) Gem
             iMod.text:SetFormattedText("|cff00ff00%s|r|cff00ff00%s|r", "E", "G")
         end
-    elseif numSockets > 0 and not item_is_enchantable then
-        if foundGems < numSockets then      -- Missing (Red) Gem
-            iMod.text:SetFormattedText("|cffff0000%s|r", "G")
-        elseif foundGems == numSockets then -- Found (Green) Gem
-            iMod.text:SetFormattedText("|cff00ff00%s|r", "G")
+    elseif socket_count > 0 and not item_is_enchantable then
+        if is_missing_gems then
+            iMod.text:SetFormattedText("|cffff0000%s|r", "G")  -- Red G, missing a gem
+        else
+            iMod.text:SetFormattedText("|cff00ff00%s|r", "G") -- Green G, has full gems
         end
-    elseif numSockets == 0 and item_is_enchantable then
-        if enchant_id then -- Item is enchanted
-            iMod.text:SetFormattedText("|cff00ff00%s|r", "E")
-        else               -- Item not chanted
-            iMod.text:SetFormattedText("|cffff0000%s|r", "E")
+    elseif socket_count == 0 and item_is_enchantable then
+        if not enchant_id then
+            iMod.text:SetFormattedText("|cffff0000%s|r", "E") -- Red E, missing enchant
+        else
+            iMod.text:SetFormattedText("|cff00ff00%s|r", "E") -- Green E, has enchant
         end
-    elseif numSockets == 0 and not item_is_enchantable then
+    elseif socket_count == 0 and not item_is_enchantable then
         iMod.text:SetFormattedText("")
     end
 

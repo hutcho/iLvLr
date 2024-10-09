@@ -1,10 +1,10 @@
 ## Interface: 110002
 ## Title: |cff00ff00iLvLr|r
 ## Author: hutcho
-## Version: 1.1.0
+## Version: 1.2.0
 ## Notes: Show item ilevel, enchant and durability in the character pane
-## Dependancies:
 ## SavedVariablesPerCharacter: iLvLrSettings, iDuraState, iColourState, iRelicState
+## X-Curse-Project-Name: iLvLr2
 ## X-Curse-Project-ID: 1089812
 ## X-Website: https://github.com/hutcho/iLvLr
 

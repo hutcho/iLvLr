@@ -1,0 +1,24 @@
+{
+    "indent_style": "space",
+    "indent_size": "4",
+    "diagnostics.globals": [
+        "CharacterHeadSlot",
+        "CharacterNeckSlot",
+        "CharacterShoulderSlot",
+        "CharacterBackSlot",
+        "CharacterChestSlot",
+        "CharacterWristSlot",
+        "CharacterShirtSlot",
+        "CharacterTabardSlot",
+        "CharacterMainHandSlot",
+        "CharacterSecondaryHandSlot",
+        "CharacterHandsSlot",
+        "CharacterWaistSlot",
+        "CharacterLegsSlot",
+        "CharacterFeetSlot",
+        "CharacterFinger0Slot",
+        "CharacterFinger1Slot",
+        "CharacterTrinket0Slot",
+        "CharacterTrinket1Slot"
+    ]
+}
