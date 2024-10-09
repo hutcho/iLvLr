@@ -116,7 +116,7 @@ function ilvlr:main()
     addonTable.f:SetScript("OnShow", function(self) ilvlr:iLvLrOnLoad() end)
     ilvlr.iLvLrFrame = CreateFrame("Frame", "iLvLrFrame", UIParent)
     ilvlr.iLvLrFrame:RegisterEvent("ADDON_LOADED")
-    ilvlr.iLvLrFrame:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
+    ilvlr.iLvLrFrame:RegisterEvent("PLAYER_AVG_ITEM_LEVEL_UPDATE")
     ilvlr.iLvLrFrame:RegisterEvent("SOCKET_INFO_UPDATE")
     ilvlr.iLvLrFrame:RegisterEvent("UPDATE_INVENTORY_DURABILITY")
     ilvlr.iLvLrFrame:SetScript("OnEvent", iLvLrOnEvent)
@@ -179,7 +179,7 @@ function iLvLrOnEvent(self, event)
         ilvlr:init_variables()
         ilvlr:apply_durability_visibility()
         iLvLrOnItemUpdate()
-    elseif event == "PLAYER_EQUIPMENT_CHANGED" or event == "SOCKET_INFO_UPDATE" then
+    elseif event == "PLAYER_AVG_ITEM_LEVEL_UPDATE" or event == "SOCKET_INFO_UPDATE" then
         iLvLrOnItemUpdate()
     elseif event == "UPDATE_INVENTORY_DURABILITY" then
         iLvLrOnDuraUpdate()
@@ -394,8 +394,8 @@ function make_ilvl_frame(frame, slot_name, ilvl)
     end
 
     if iColourState then
-        local _, avgItemLevelEquipped, _ = GetAverageItemLevel()
-        if ilvl <= avgItemLevelEquipped - 10 then
+        local avgItemLevelBags, _, _ = GetAverageItemLevel()
+        if ilvl <= avgItemLevelBags - 5 then
             -- red
             ilvl_frame.text:SetFormattedText("|cffff0000%i|r", ilvl)
         elseif ilvl >= avgItemLevelEquipped + 10 then
