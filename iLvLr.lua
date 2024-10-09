@@ -112,12 +112,26 @@ local iModFrames = {}
 
 
 function ilvlr:main()
+    addonTable.f = CreateFrame("Frame", "iLvLrmain", CharacterFrame, "BackdropTemplate")
+    addonTable.f:SetScript("OnShow", function(self) ilvlr:iLvLrOnLoad() end)
     ilvlr.iLvLrFrame = CreateFrame("Frame", "iLvLrFrame", UIParent)
     ilvlr.iLvLrFrame:RegisterEvent("ADDON_LOADED")
     ilvlr.iLvLrFrame:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
     ilvlr.iLvLrFrame:RegisterEvent("SOCKET_INFO_UPDATE")
     ilvlr.iLvLrFrame:RegisterEvent("UPDATE_INVENTORY_DURABILITY")
     ilvlr.iLvLrFrame:SetScript("OnEvent", iLvLrOnEvent)
+end
+
+function ilvlr:iLvLrOnLoad()
+    -- Loop over all item slots by name
+    for i, slot_name in pairs(slotDB) do
+        if slot_name ~= "ShirtSlot" and slot_name ~= "TabardSlot" then
+            local ilvl = utils:get_ilevel_from_slot_name(slot_name)
+            if ilvl then
+                ilvlr:iLvlrUpdateAll(frameDB[i], slot_name, ilvl)
+            end
+        end
+    end
 end
 
 function ilvlr:init_variables()
