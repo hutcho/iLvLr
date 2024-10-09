@@ -110,8 +110,6 @@ local iLvlFrames = {}
 local iDuraFrames = {}
 local iModFrames = {}
 
--- ilvlr.f = CreateFrame("Frame", "iLvLrmain", CharacterFrame, "BackdropTemplate")
--- ilvlr.f:SetScript("OnShow", function(self) iLvLrOnLoad() end)
 
 function ilvlr:main()
     ilvlr.iLvLrFrame = CreateFrame("Frame", "iLvLrFrame", UIParent)
@@ -179,18 +177,6 @@ function ilvlr:iLvlrUpdateAll(frame, slot_name, ilvl)
     makeDurability(frame, slot_name)
     makeMod(frame, slot_name)
 end
-
--- function iLvLrOnLoad()
---     -- Loop over all item slots by name
---     for i, slot_name in pairs(slotDB) do
---         if slot_name ~= "ShirtSlot" and slot_name ~= "TabardSlot" then
---             local ilvl = utils:get_ilevel_from_slot_name(slot_name)
---             if ilvl then
---                 iLvlrUpdateAll(frameDB[i], slot_name, ilvl)
---             end
---         end
---     end
--- end
 
 function iLvLrOnItemUpdate()
     for i, slot_name in pairs(slotDB) do
@@ -460,7 +446,6 @@ function makeDurability(frame, slot)
     if iDuraState then
         iDura:Show()
     end
-
 end
 
 function makeMod(frame, slot_name)
@@ -492,133 +477,6 @@ function makeMod(frame, slot_name)
     local item_is_enchantable = false
 
     local enchant_id
-
-
-    -- if slot_ilvl <= 376 then
-    --     if slot_name == "WaistSlot" then
-    --         item_is_enchantable = true
-
-    --         local baseSockets = fetchBaseSocket(slot_name)
-    --         if (baseSockets - numSockets) == -1 then
-    --             enchant_id = 1
-    --         else
-    --             enchant_id = nil
-    --         end
-    --     else
-    --         for i, slot_name in pairs(item_is_enchantable) do
-    --             if v == slot_name then
-    --                 item_is_enchantable = true
-    --                 enchant_id = utils:get_enchantid_for_slotname(slot_name)
-    --             end
-    --         end
-    --     end
-    -- end
-
-    -- elseif slot_ilvl ~= "" and slot_ilvl > 20 then
-    --     if slot_name == "SecondaryHandSlot" and slot_ilvl < 151 then
-    --         local offHand = GetInventoryItemID("player", GetInventorySlotInfo("SecondaryHandSlot"))
-    --         local _, _,itemRarity, _, _, itemClass, itemSubclass, _, _, _, _ = GetItemInfo(offHand)
-    --         if itemClass == "Weapon" or itemRarity == 7 then
-    --             item_is_enchantable = true
-    --             enchant_id = utils:get_enchantid_for_slotname(slot_name)
-    --         end
-    --         --print(itemClass)
-    --         --print(itemSubclass)
-    --     elseif slot_ilvl > 48 and slot_ilvl < 61 then
-    --         local mainHand = GetInventoryItemID("player", GetInventorySlotInfo("MainHandSlot"))
-    --         if mainHand ~= nil then
-    --             local _, _, _, _, _, itemClass, _, _, _, _, _ = GetItemInfo(mainHand)
-    --             local _, englishClass, _ = UnitClass("player")
-    --             if slot_name == "MainHandSlot" or slot_name == "SecondaryHandSlot" then
-    --                 if itemClass == "Weapon" then
-    --                     if englishClass == "DEATHKNIGHT" then
-    --                         item_is_enchantable = true
-    --                         enchant_id = utils:get_enchantid_for_slotname(slot_name)
-    --                     end
-    --                 else
-    --                     item_is_enchantable = false
-    --                 end
-    --             else
-    --                 for k ,v in pairs(isEnchantableWoD) do
-    --                     if v == slot_name then
-    --                         item_is_enchantable = true
-    --                         enchant_id = utils:get_enchantid_for_slotname(slot_name)
-    --                     end
-    --                 end
-    --             end
-    --         end
-    --     elseif slot_ilvl > 60 and slot_ilvl < 141 then
-    --         if slot_name == "SecondaryHandSlot" then
-    --             local offHand = GetInventoryItemID("player", GetInventorySlotInfo("SecondaryHandSlot"))
-    --             -- itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = GetItemInfo()
-    --             local _, _, _, _, _, itemType, _, _, _, _, _ = GetItemInfo(offHand)
-    --             if offHand ~= nil then
-    --                 if itemType == "Weapon" then
-    --                     item_is_enchantable = true
-    --                     enchant_id = utils:get_enchantid_for_slotname(slot_name)
-    --                 else
-    --                     item_is_enchantable = false
-    --                 end
-    --             end
-    --         elseif slot_name == "WristSlot" then
-    --             for k, v in pairs(profIDs) do
-    --                 if v == 333 then
-    --                     item_is_enchantable = true
-    --                     enchant_id = utils:get_enchantid_for_slotname(slot_name)
-    --                 end
-    --             end
-    --         elseif slot_name == "WaistSlot" then
-    --             for k, v in pairs(profIDs) do
-    --                 if v == 202 then
-    --                     item_is_enchantable = true
-    --                     enchant_id = utils:get_enchantid_for_slotname(slot_name)
-    --                 end
-    --             end
-    --         elseif slot_name == "BackSlot" then
-    --             for k, v in pairs(profIDs) do
-    --                 if v == 197 then
-    --                     item_is_enchantable = true
-    --                     enchant_id = utils:get_enchantid_for_slotname(slot_name)
-    --                 end
-    --             end
-    --         else
-    --             for k ,v in pairs(isEnchantableBfA) do
-    --                 if v == slot_name then
-    --                     item_is_enchantable = true
-    --                     enchant_id = utils:get_enchantid_for_slotname(slot_name)
-    --                 end
-    --             end
-    --         end
-    --     elseif slot_ilvl > 140 then
-    --         if slot_name == "SecondaryHandSlot" then
-    --             for k,v in pairs(dualWield) do
-    --                 if v == specID then
-    --                     item_is_enchantable = true
-    --                     enchant_id = utils:get_enchantid_for_slotname(slot_name)
-    --                 end
-    --             end
-    --         elseif slot_name == "HandsSlot" then
-    --             item_is_enchantable = false
-    --             if englishClass == "DEATHKNIGHT" or englishClass == "WARRIOR" or englishClass == "PALADIN" then
-    --                 item_is_enchantable = true
-    --                 enchant_id = utils:get_enchantid_for_slotname(slot_name)
-    --             end
-    --             for k,v in pairs(profIDs) do
-    --                 if v == 182 or v == 186 or v == 393 then --182 Herbalism, 186 Mining, 393 Skining
-    --                     item_is_enchantable = true
-    --                     enchant_id = utils:get_enchantid_for_slotname(slot_name)
-    --                 end
-    --             end
-    --         else
-    --             for k,v in pairs(isEnchantableSL) do
-    --                 if v == slot_name then
-    --                     item_is_enchantable = true
-    --                     enchant_id = utils:get_enchantid_for_slotname(slot_name)
-    --                 end
-    --             end
-    --         end
-    --     else
-
 
     if slot_ilvl >= 350 then
         for _, enchantable_slot in pairs(EnchantableSlotsTWW) do
