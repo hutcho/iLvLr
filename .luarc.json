@@ -19,6 +19,11 @@
         "CharacterFinger0Slot",
         "CharacterFinger1Slot",
         "CharacterTrinket0Slot",
-        "CharacterTrinket1Slot"
+        "CharacterTrinket1Slot",
+        "CharacterFrame",
+        "SlashCmdList",
+        "iDuraState",
+        "iColourState",
+        "iRelicState"
     ]
 }
