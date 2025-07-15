@@ -119,7 +119,7 @@ function ilvlr:main()
     ilvlr.iLvLrFrame:RegisterEvent("PLAYER_AVG_ITEM_LEVEL_UPDATE")
     ilvlr.iLvLrFrame:RegisterEvent("SOCKET_INFO_UPDATE")
     ilvlr.iLvLrFrame:RegisterEvent("UPDATE_INVENTORY_DURABILITY")
-    ilvlr.iLvLrFrame:SetScript("OnEvent", iLvLrOnEvent)
+    ilvlr.iLvLrFrame:SetScript("OnEvent", ilvlr.iLvLrOnEvent)
 end
 
 function ilvlr:iLvLrOnLoad()
@@ -163,7 +163,7 @@ function SlashCmdList.ILVLR(msg)
         print("iLvLr: Durability turned " .. (iDuraState and "|cff00ff00on|r!" or "|cffff0000off|r!"))
     elseif msg == "colour" or msg == "color" or msg == "c" then
         iColourState = not iColourState
-        iLvLrOnItemUpdate()
+        ilvlr:iLvLrOnItemUpdate()
         print("iLvLr: Colour turned " .. (iColourState and "|cff00ff00on|r!" or "|cffff0000off|r!"))
     else
         print(Title .. " v" .. Core .. "." .. Revision .. "." .. Build)
@@ -174,25 +174,25 @@ function SlashCmdList.ILVLR(msg)
 end
 
 --Thanks to John454ss for code help
-function iLvLrOnEvent(self, event)
+function ilvlr:iLvLrOnEvent(event)
     if event == "ADDON_LOADED" then
         ilvlr:init_variables()
         ilvlr:apply_durability_visibility()
-        iLvLrOnItemUpdate()
+        ilvlr:iLvLrOnItemUpdate()
     elseif event == "PLAYER_AVG_ITEM_LEVEL_UPDATE" or event == "SOCKET_INFO_UPDATE" then
-        iLvLrOnItemUpdate()
+        ilvlr:iLvLrOnItemUpdate()
     elseif event == "UPDATE_INVENTORY_DURABILITY" then
-        iLvLrOnDuraUpdate()
+        ilvlr:iLvLrOnDuraUpdate()
     end
 end
 
 function ilvlr:iLvlrUpdateAll(frame, slot_name, ilvl)
-    make_ilvl_frame(frame, slot_name, ilvl)
-    makeDurability(frame, slot_name)
-    makeMod(frame, slot_name)
+    ilvlr:make_ilvl_frame(frame, slot_name, ilvl)
+    ilvlr:makeDurability(frame, slot_name)
+    ilvlr:makeMod(frame, slot_name)
 end
 
-function iLvLrOnItemUpdate()
+function ilvlr:iLvLrOnItemUpdate()
     for i, slot_name in pairs(slotDB) do
         local ilvl = utils:get_ilevel_from_slot_name(slot_name)
         if ilvl then
@@ -213,11 +213,11 @@ function iLvLrOnItemUpdate()
     end
 end
 
-function iLvLrOnDuraUpdate()
+function ilvlr:iLvLrOnDuraUpdate()
     for i, slot_name in pairs(slotDB) do
         local iLevel = utils:get_ilevel_from_slot_name(slot_name)
         if iLevel then
-            makeDurability(frameDB[i], slot_name)
+            ilvlr:makeDurability(frameDB[i], slot_name)
         else
             if iDuraFrames[slot_name] then
                 iDuraFrames[slot_name]:Hide()
@@ -226,14 +226,14 @@ function iLvLrOnDuraUpdate()
     end
 end
 
-function iLvLrOnModUpdate()
+function ilvlr:iLvLrOnModUpdate()
     for i, slot_name in pairs(slotDB) do
         local iLevel = utils:get_ilevel_from_slot_name(slot_name)
         if iLevel then
             if slot_name == "ShirtSlot" or slot_name == "TabardSlot" then
                 -- Do Nothing
             else
-                makeMod(frameDB[i], slot_name)
+                ilvlr:makeMod(frameDB[i], slot_name)
             end
         else
             if iModFrames[slot_name] then
@@ -266,7 +266,7 @@ function fetchProfs()
     return profIDs
 end
 
-function fetchDura(slotName)
+function ilvlr:fetchDura(slotName)
     local slotId, _ = GetInventorySlotInfo(slotName)
     if slotId then
         local itemDurability, itemMaxDurability = GetInventoryItemDurability(slotId)
@@ -308,7 +308,7 @@ function ilvlr:ilvlr_get_socketed_gem_count(slotName)
     return gem_count
 end
 
-function make_ilvl_frame(frame, slot_name, ilvl)
+function ilvlr:make_ilvl_frame(frame, slot_name, ilvl)
     local ilvl_frame = iLvlFrames[slot_name]
     if not ilvl_frame then
         ilvl_frame = CreateFrame("Frame", nil, frame, "BackdropTemplate")
@@ -350,7 +350,7 @@ function make_ilvl_frame(frame, slot_name, ilvl)
     iLvlFrames[slot_name] = ilvl_frame
 end
 
-function makeDurability(frame, slot)
+function ilvlr:makeDurability(frame, slot)
     local itemDurability, itemMaxDurability
     local iDura = iDuraFrames[slot]
     if not iDura then
@@ -371,9 +371,9 @@ function makeDurability(frame, slot)
         iDuraText:SetFont("Fonts\\FRIZQT__.TTF", 13, "OUTLINE")
         iDuraText:SetPoint("CENTER", iDura, "CENTER", 0, 0)
         iDura.text = iDuraText
-        itemDurability, itemMaxDurability = fetchDura(slot)
+        itemDurability, itemMaxDurability = ilvlr:fetchDura(slot)
     else
-        itemDurability, itemMaxDurability = fetchDura(slot)
+        itemDurability, itemMaxDurability = ilvlr:fetchDura(slot)
     end
 
     if itemDurability == -1 and itemMaxDurability == -1 then
@@ -399,7 +399,7 @@ function makeDurability(frame, slot)
     end
 end
 
-function makeMod(frame, slot_name)
+function ilvlr:makeMod(frame, slot_name)
     local iMod = iModFrames[slot_name]
     local slot_ilvl = utils:get_ilevel_from_slot_name(slot_name)
     if not iMod then
