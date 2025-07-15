@@ -253,19 +253,6 @@ function ExtractItemString(link)
 end
 
 
-function fetchProfs()
-    local prof1, prof2 = GetProfessions()
-    local profs = { prof1, prof2 }
-    local profIDs = {}
-
-    for _, v in pairs(profs) do
-        local _, _, _, _, _, _, skillID = GetProfessionInfo(v)
-        tinsert(profIDs, skillID)
-    end
-
-    return profIDs
-end
-
 function ilvlr:fetchDura(slotName)
     local slotId, _ = GetInventorySlotInfo(slotName)
     if slotId then
@@ -283,7 +270,7 @@ function ilvlr:get_number_of_sockets(slotName)
     local itemLink = GetInventoryItemLink("player", GetInventorySlotInfo(slotName))
     if itemLink then
         local itemStats = C_Item.GetItemStats(itemLink)
-        socketCount = (itemStats["EMPTY_SOCKET_RED"]       or 0) +
+        local socketCount = (itemStats["EMPTY_SOCKET_RED"]       or 0) +
             (itemStats["EMPTY_SOCKET_YELLOW"]    or 0) +
             (itemStats["EMPTY_SOCKET_BLUE"]      or 0) +
             (itemStats["EMPTY_SOCKET_META"]      or 0) +
