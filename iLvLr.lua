@@ -243,12 +243,13 @@ function iLvLrOnModUpdate()
     end
 end
 
-function GetItemLinkInfo(link)
-    local itemColor, itemString, itemName
+function ExtractItemString(link)
+    local itemString
     if (link) then
-        itemColor, itemString, itemName = link:match("(|c%x+)|Hitem:([-%d:%a]+)|h%[(.-)%]|h|r");
+    -- itemLink = "|cnIQ4:|Hitem:225749:7345:213743::::::80:72::81:7:6652:10354:10270:1507:10255:10395:10878:1:28:2462:::::|h[Seal of the Void-Touched]|h|r"
+        itemString = link:match("|Hitem:([-%d:%a]+)|h")
     end
-    return itemName, itemString, itemColor
+    return itemString
 end
 
 
@@ -291,15 +292,16 @@ function ilvlr:get_number_of_sockets(slotName)
     end
 end
 
-function ilvlr_get_socketed_gem_count(slotName)
+function ilvlr:ilvlr_get_socketed_gem_count(slotName)
     local itemLink = GetInventoryItemLink("player", GetInventorySlotInfo(slotName))
-    local _, itemString, _ = GetItemLinkInfo(itemLink)
-    local ids = utils:SplitString(itemString)
+    -- itemLink = "|cnIQ4:|Hitem:225749:7345:213743::::::80:72::81:7:6652:10354:10270:1507:10255:10395:10878:1:28:2462:::::|h[Seal of the Void-Touched]|h|r"
+    local itemString = ExtractItemString(itemLink)
+    local itemString_parts = strsplittable(":", itemString)
 
     local gem_count = 0
-    -- loop over gem slots
-    for i = 1, 4 do
-        local has_gem = tonumber(ids[i+2])
+    -- loop over gem info in itemString (all 4 gem info parts)
+    for i = 3, 6 do
+        local has_gem = tonumber(itemString_parts[i])
         if has_gem then gem_count = gem_count + 1 end
     end
 
@@ -424,7 +426,7 @@ function makeMod(frame, slot_name)
     local socket_count = ilvlr:get_number_of_sockets(slot_name)
     local gem_count = 0
     if socket_count > 0 then
-        gem_count = ilvlr_get_socketed_gem_count(slot_name)
+        gem_count = ilvlr:ilvlr_get_socketed_gem_count(slot_name)
     end
 
     local item_is_enchantable
